@@ -14,6 +14,8 @@ config :stripcross, StripcrossWeb.Endpoint,
   render_errors: [view: StripcrossWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Stripcross.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :stripcross, base_host: System.get_env("BASE_HOST")
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
