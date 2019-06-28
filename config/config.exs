@@ -16,6 +16,8 @@ config :stripcross, StripcrossWeb.Endpoint,
 
 config :stripcross, base_host: System.get_env("BASE_HOST")
 
+config :hound, driver: "chrome_driver", browser: "chrome_headless"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
