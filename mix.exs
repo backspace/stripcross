@@ -42,7 +42,8 @@ defmodule Stripcross.MixProject do
       {:hound, "~> 1.0"},
       {:httpoison, "~> 1.4"},
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
-      {:mock, "~> 0.3.0", only: :test}
+      {:mock, "~> 0.3.0", only: :test},
+      {:modest_ex, "~> 1.0.4"}
     ]
   end
 end

@@ -16,7 +16,11 @@ config :stripcross, StripcrossWeb.Endpoint,
 
 config :stripcross, base_host: System.get_env("BASE_HOST")
 
+config :stripcross,
+  puzzle_selector: System.get_env("PUZZLE_SELECTOR")
+
 config :hound, driver: "chrome_driver", browser: "chrome_headless"
+config :modest_ex, scope: :html
 
 # Configures Elixir's Logger
 config :logger, :console,
