@@ -12,6 +12,7 @@ defmodule StripcrossWeb.PageController do
 
     transformed =
       ModestEx.append("<html><head>#{title}</head><body></body></html>", "body", puzzle_table)
+      |> ModestEx.remove(".letter")
 
     conn
     |> html(transformed)
