@@ -1,5 +1,7 @@
 # Stripcross
 
+This reformats pages from a crossword site.
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
