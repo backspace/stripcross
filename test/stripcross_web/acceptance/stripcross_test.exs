@@ -16,6 +16,9 @@ defmodule HoundTest do
       puzzle_selector = Application.get_env(:stripcross, :puzzle_selector)
       puzzle_id = String.slice(puzzle_selector, 1..-1)
 
+      clues_selector = Application.get_env(:stripcross, :clues_selector)
+      clues_id = String.slice(clues_selector, 1..-1)
+
       with_mock HTTPoison,
         get!: fn _url ->
           %{
@@ -29,6 +32,10 @@ defmodule HoundTest do
                 <div id=#{puzzle_id}>
                   this is preserved
                   <div class=letter>this is removed</div>
+                </div>
+                <div id=#{clues_id}>
+                  <div>1</div>
+                  <div>A clue : <a>AN ANSWER</a></div>
                 </div>
               </body>
             </html>
@@ -46,6 +53,16 @@ defmodule HoundTest do
                  Hound.Helpers.Element.visible_text({:css, puzzle_selector}),
                  "this is preserved"
                )
+
+        assert Hound.Matchers.element?(:css, clues_selector)
+
+        assert Hound.Helpers.Element.visible_text({:css, "#{clues_selector} div:first-child"}) ==
+                 "1"
+
+        assert Hound.Helpers.Element.visible_text({:css, "#{clues_selector} div:last-child"}) ==
+                 "A clue :"
+
+        refute Hound.Matchers.element?(:css, "#{clues_selector} a")
 
         refute Hound.Matchers.element?(:css, "#ignored")
         refute Hound.Matchers.element?(:css, ".letter")

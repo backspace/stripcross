@@ -10,4 +10,5 @@ config :stripcross, StripcrossWeb.Endpoint,
 config :logger, level: :warn
 
 config :stripcross,
-  puzzle_selector: "#Puzzle"
+  puzzle_selector: "#Puzzle",
+  clues_selector: "#Clues"
