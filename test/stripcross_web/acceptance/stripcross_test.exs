@@ -23,12 +23,14 @@ defmodule HoundTest do
               </head>
               <body>
                 <div id=ignored>this is ignored</div>
-                <div id=Puzzle>
-                  this is preserved
-                  <div class=letter>this is removed</div>
-                  <div class="something"></div>
-                  <div class="something-else"></div>
-                </div>
+                <table id=Puzzle>
+                  <tr><td>this is preserved</td></tr>
+                  <tr>
+                    <td class=letter>this is removed</td>
+                    <td class="something"></td>
+                    <td class="something-else"></td>
+                  </tr>
+                </table>
                 <div id=Clues>
                   <div>1</div>
                   <div>A clue : <a>AN ANSWER</a></div>

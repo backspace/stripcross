@@ -19,6 +19,11 @@ defmodule StripcrossWeb.PageController do
     <html>
       <head>
         <style>
+          .warning {
+            background: pink;
+            padding: 1em;
+          }
+
           table {
             border-collapse: collapse;
           }
@@ -74,6 +79,27 @@ defmodule StripcrossWeb.PageController do
           transformed_class
         )
       end)
+
+    puzzle_classes =
+      ModestEx.get_attribute(transformed, "#{puzzle_selector} td", "class")
+      |> Enum.uniq()
+
+    unknown_puzzle_classes = puzzle_classes -- Map.values(puzzle_class_mappings)
+
+    transformed =
+      case unknown_puzzle_classes do
+        [] ->
+          transformed
+
+        _ ->
+          ModestEx.prepend(
+            transformed,
+            "body",
+            "<p class='warning'>Puzzle contains unknown class(es): #{
+              Enum.join(unknown_puzzle_classes, ", ")
+            }</p>"
+          )
+      end
 
     conn
     |> html(transformed)
