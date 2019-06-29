@@ -88,6 +88,10 @@ defmodule StripcrossWeb.PageController do
             display: flex;
           }
 
+          #{clues_selector} div div:nth-child(2) {
+            max-width: 15em;
+          }
+
           #{clues_selector} div div div {
             display: inline;
           }
