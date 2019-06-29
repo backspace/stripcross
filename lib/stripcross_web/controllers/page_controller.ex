@@ -40,6 +40,18 @@ defmodule StripcrossWeb.PageController do
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
           }
 
+          h1 {
+            display: inline-block;
+            font-size: 1.5em;
+            margin: 0;
+          }
+
+          h2 {
+            display: inline-block;
+            font-size: 1em;
+            margin: 0 0 0 1rem;
+          }
+
           .warning {
             background: pink;
             padding: 1em;
