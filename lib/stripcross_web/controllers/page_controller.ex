@@ -1,5 +1,6 @@
 defmodule StripcrossWeb.PageController do
   use StripcrossWeb, :controller
+  require Logger
 
   def index(conn, _params) do
     HTTPoison.start()
