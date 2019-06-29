@@ -13,12 +13,6 @@ defmodule HoundTest do
 
   describe "homepage" do
     test "homepage loads stripped source page", _meta do
-      puzzle_selector = Application.get_env(:stripcross, :puzzle_selector)
-      puzzle_id = String.slice(puzzle_selector, 1..-1)
-
-      clues_selector = Application.get_env(:stripcross, :clues_selector)
-      clues_id = String.slice(clues_selector, 1..-1)
-
       with_mock HTTPoison,
         get!: fn _url ->
           %{
@@ -29,13 +23,13 @@ defmodule HoundTest do
               </head>
               <body>
                 <div id=ignored>this is ignored</div>
-                <div id=#{puzzle_id}>
+                <div id=Puzzle>
                   this is preserved
                   <div class=letter>this is removed</div>
                   <div class="something"></div>
                   <div class="something-else"></div>
                 </div>
-                <div id=#{clues_id}>
+                <div id=Clues>
                   <div>1</div>
                   <div>A clue : <a>AN ANSWER</a></div>
                 </div>
@@ -49,28 +43,28 @@ defmodule HoundTest do
 
         assert page_title() == "Hello"
 
-        assert Hound.Matchers.element?(:css, puzzle_selector)
+        assert Hound.Matchers.element?(:css, "#Puzzle")
 
         assert String.contains?(
-                 Hound.Helpers.Element.visible_text({:css, puzzle_selector}),
+                 Hound.Helpers.Element.visible_text({:css, "#Puzzle"}),
                  "this is preserved"
                )
 
-        refute Hound.Matchers.element?(:css, "#{puzzle_selector} .something")
-        assert Hound.Matchers.element?(:css, "#{puzzle_selector} .transformed-something")
+        refute Hound.Matchers.element?(:css, "#Puzzle .something")
+        assert Hound.Matchers.element?(:css, "#Puzzle .transformed-something")
 
-        refute Hound.Matchers.element?(:css, "#{puzzle_selector} .something-else")
-        assert Hound.Matchers.element?(:css, "#{puzzle_selector} .transformed-something-else")
+        refute Hound.Matchers.element?(:css, "#Puzzle .something-else")
+        assert Hound.Matchers.element?(:css, "#Puzzle .transformed-something-else")
 
-        assert Hound.Matchers.element?(:css, clues_selector)
+        assert Hound.Matchers.element?(:css, "#Clues")
 
-        assert Hound.Helpers.Element.visible_text({:css, "#{clues_selector} div:first-child"}) ==
+        assert Hound.Helpers.Element.visible_text({:css, "#Clues div:first-child"}) ==
                  "1"
 
-        assert Hound.Helpers.Element.visible_text({:css, "#{clues_selector} div:last-child"}) ==
+        assert Hound.Helpers.Element.visible_text({:css, "#Clues div:last-child"}) ==
                  "A clue :"
 
-        refute Hound.Matchers.element?(:css, "#{clues_selector} a")
+        refute Hound.Matchers.element?(:css, "#Clues a")
 
         refute Hound.Matchers.element?(:css, "#ignored")
         refute Hound.Matchers.element?(:css, ".letter")
