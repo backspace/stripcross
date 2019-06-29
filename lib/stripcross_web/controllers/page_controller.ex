@@ -117,7 +117,28 @@ defmodule StripcrossWeb.PageController do
           )
       end
 
+    h1_find = ModestEx.find(body, "h1:first-of-type")
+
+    transformed =
+      case h1_find do
+        {:error, _} ->
+          transformed
+
+        _ ->
+          with_h1 = ModestEx.prepend(transformed, "body", self_or_first(h1_find))
+
+          h2_find = ModestEx.find(body, "h2:first-of-type")
+
+          case h2_find do
+            {:error, _} -> with_h1
+            _ -> ModestEx.insert_after(with_h1, "h1", self_or_first(h2_find))
+          end
+      end
+
     conn
     |> html(transformed)
   end
+
+  defp self_or_first(array) when is_list(array), do: hd(array)
+  defp self_or_first(self), do: self
 end

@@ -25,6 +25,8 @@ defmodule HoundTest do
               </head>
               <body>
                 <div id=ignored>this is ignored</div>
+                <h1 id=Title></h1>
+                <h2 id=Subtitle></h2>
                 <table id=Puzzle>
                   <tr><td>this is preserved</td></tr>
                   <tr>
@@ -37,6 +39,10 @@ defmodule HoundTest do
                   <div>1</div>
                   <div>A clue : <a>AN ANSWER</a></div>
                 </div>
+                <div>
+                  <h1 id=IgnoredTitle></h1>
+                  <h2 id=IgnoredSubtitle></h2>
+                </div>
               </body>
             </html>
             """
@@ -46,6 +52,12 @@ defmodule HoundTest do
         navigate_to(@page_url)
 
         assert page_title() == "Hello"
+
+        assert Hound.Matchers.element?(:css, "#Title")
+        assert Hound.Matchers.element?(:css, "#Subtitle")
+
+        refute Hound.Matchers.element?(:css, "#IgnoredTitle")
+        refute Hound.Matchers.element?(:css, "#IgnoredSubtitle")
 
         assert Hound.Matchers.element?(:css, "#Puzzle")
 
