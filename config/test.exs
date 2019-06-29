@@ -15,4 +15,5 @@ config :stripcross,
   puzzle_selector: "#Puzzle",
   puzzle_class_mappings:
     "something:transformed-something something-else:transformed-something-else",
-  clues_selector: "#Clues"
+  clues_selector: "#Clues",
+  path_template: "FORMATTED_DATE.html"

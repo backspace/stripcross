@@ -6,11 +6,14 @@ defmodule StripcrossWeb.PageController do
 
     base_url = Application.get_env(:stripcross, :base_host)
 
-    path =
+    path_date =
       case conn.path_info do
         [] -> Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
         [date] -> date
       end
+
+    path_template = Application.get_env(:stripcross, :path_template)
+    path = String.replace(path_template, "FORMATTED_DATE", path_date)
 
     url = "#{base_url}#{path}"
 

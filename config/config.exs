@@ -19,7 +19,8 @@ config :stripcross, base_host: System.get_env("BASE_HOST")
 config :stripcross,
   puzzle_selector: System.get_env("PUZZLE_SELECTOR"),
   puzzle_class_mappings: System.get_env("PUZZLE_CLASS_MAPPINGS"),
-  clues_selector: System.get_env("CLUES_SELECTOR")
+  clues_selector: System.get_env("CLUES_SELECTOR"),
+  path_template: System.get_env("PATH_TEMPLATE")
 
 config :hound, driver: "chrome_driver", browser: "chrome_headless"
 config :modest_ex, scope: :html

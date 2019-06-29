@@ -109,7 +109,7 @@ defmodule HoundTest do
       with_mock HTTPoison,
         get!: fn url ->
           today_string = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
-          today_string_url = "/#{today_string}"
+          today_string_url = "/#{today_string}.html"
 
           title =
             case url do
@@ -145,7 +145,7 @@ defmodule HoundTest do
 
         navigate_to(page_url(StripcrossWeb.Endpoint, :index, "2019-01-01"))
 
-        assert page_title() == "/2019-01-01"
+        assert page_title() == "/2019-01-01.html"
       end
     end
   end
