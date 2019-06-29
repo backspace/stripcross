@@ -32,6 +32,8 @@ defmodule HoundTest do
                 <div id=#{puzzle_id}>
                   this is preserved
                   <div class=letter>this is removed</div>
+                  <div class="something"></div>
+                  <div class="something-else"></div>
                 </div>
                 <div id=#{clues_id}>
                   <div>1</div>
@@ -53,6 +55,12 @@ defmodule HoundTest do
                  Hound.Helpers.Element.visible_text({:css, puzzle_selector}),
                  "this is preserved"
                )
+
+        refute Hound.Matchers.element?(:css, "#{puzzle_selector} .something")
+        assert Hound.Matchers.element?(:css, "#{puzzle_selector} .transformed-something")
+
+        refute Hound.Matchers.element?(:css, "#{puzzle_selector} .something-else")
+        assert Hound.Matchers.element?(:css, "#{puzzle_selector} .transformed-something-else")
 
         assert Hound.Matchers.element?(:css, clues_selector)
 

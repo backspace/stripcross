@@ -8,7 +8,9 @@ defmodule StripcrossWeb.PageController do
     body = HTTPoison.get!(url).body
 
     title = ModestEx.find(body, "title")
-    puzzle_table = ModestEx.find(body, Application.get_env(:stripcross, :puzzle_selector))
+
+    puzzle_selector = Application.get_env(:stripcross, :puzzle_selector)
+    puzzle_table = ModestEx.find(body, puzzle_selector)
 
     clues_selector = Application.get_env(:stripcross, :clues_selector)
     clues = ModestEx.find(body, clues_selector)
@@ -54,6 +56,24 @@ defmodule StripcrossWeb.PageController do
       |> ModestEx.remove(".letter")
       |> ModestEx.append("body", clues)
       |> ModestEx.remove("#{clues_selector} a")
+
+    puzzle_class_mappings_string = Application.get_env(:stripcross, :puzzle_class_mappings)
+
+    puzzle_class_mappings =
+      String.split(puzzle_class_mappings_string, " ")
+      |> Enum.map(&String.split(&1, ":"))
+      |> Map.new(&List.to_tuple/1)
+
+    transformed =
+      Enum.reduce(puzzle_class_mappings, transformed, fn {original_class, transformed_class},
+                                                         transformed ->
+        ModestEx.set_attribute(
+          transformed,
+          "#{puzzle_selector} .#{original_class}",
+          "class",
+          transformed_class
+        )
+      end)
 
     conn
     |> html(transformed)
