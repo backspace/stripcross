@@ -78,7 +78,7 @@ defmodule HoundTest do
                  "1"
 
         assert Hound.Helpers.Element.visible_text({:css, "#Clues div:last-child"}) ==
-                 "A clue :"
+                 "A clue"
 
         refute Hound.Matchers.element?(:css, "#Clues a")
 

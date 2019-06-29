@@ -121,6 +121,7 @@ defmodule StripcrossWeb.PageController do
       |> ModestEx.remove(".letter")
       |> ModestEx.append(".container", clues)
       |> ModestEx.remove("#{clues_selector} a")
+      |> String.replace(" : <", "<")
 
     puzzle_class_mappings_string = Application.get_env(:stripcross, :puzzle_class_mappings)
 
