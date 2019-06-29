@@ -90,7 +90,7 @@ defmodule HoundTest do
       end
     end
 
-    test "warns of unknown puzzle classes", _meta do
+    test "warns of unknown puzzle classes and ignores non-following h2s", _meta do
       with_mock HTTPoison,
         get!: fn _url, _headers ->
           %{
@@ -100,6 +100,7 @@ defmodule HoundTest do
                 <title>Hello</title>
               </head>
               <body>
+                <h1 id=Title></h1>
                 <table id=Puzzle>
                   <tr>
                     <td class="something"></td>
@@ -107,6 +108,7 @@ defmodule HoundTest do
                     <td class="unknown"></td>
                   </tr>
                 </table>
+                <h2 id=NonSubtitle></h2>
                 <div id=Clues>
                 </div>
               </body>
@@ -119,6 +121,9 @@ defmodule HoundTest do
 
         assert Hound.Helpers.Element.visible_text({:css, ".warning"}) ==
                  "Puzzle contains unknown class(es): unknown"
+
+        assert Hound.Matchers.element?(:css, "#Title")
+        refute Hound.Matchers.element?(:css, "#NonSubtitle")
       end
     end
 

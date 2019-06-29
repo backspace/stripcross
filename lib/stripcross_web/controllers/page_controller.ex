@@ -171,7 +171,7 @@ defmodule StripcrossWeb.PageController do
         _ ->
           with_h1 = ModestEx.prepend(transformed, "body", self_or_first(h1_find))
 
-          h2_find = ModestEx.find(body, "h2:first-of-type")
+          h2_find = ModestEx.find(body, "h1 + h2:first-of-type")
 
           case h2_find do
             {:error, _} -> with_h1
