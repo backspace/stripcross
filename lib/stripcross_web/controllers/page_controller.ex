@@ -46,8 +46,8 @@ defmodule StripcrossWeb.PageController do
           }
 
           td {
-            width: 2rem;
-            height: 2rem;
+            width: 1.25rem;
+            height: 1.25rem;
 
             border: 1px solid black;
             vertical-align: top;
