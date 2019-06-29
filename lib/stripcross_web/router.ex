@@ -17,6 +17,7 @@ defmodule StripcrossWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/:date", PageController, :index
   end
 
   # Other scopes may use custom stacks.

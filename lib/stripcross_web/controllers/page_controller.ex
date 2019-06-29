@@ -4,7 +4,16 @@ defmodule StripcrossWeb.PageController do
   def index(conn, _params) do
     HTTPoison.start()
 
-    url = Application.get_env(:stripcross, :base_host)
+    base_url = Application.get_env(:stripcross, :base_host)
+
+    path =
+      case conn.path_info do
+        [] -> Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
+        [date] -> date
+      end
+
+    url = "#{base_url}#{path}"
+
     body = HTTPoison.get!(url).body
 
     title = ModestEx.find(body, "title")

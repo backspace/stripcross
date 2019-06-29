@@ -9,6 +9,8 @@ config :stripcross, StripcrossWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :stripcross, base_host: "/"
+
 config :stripcross,
   puzzle_selector: "#Puzzle",
   puzzle_class_mappings:
