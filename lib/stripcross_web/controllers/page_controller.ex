@@ -37,7 +37,7 @@ defmodule StripcrossWeb.PageController do
       <head>
         <style>
           html {
-            font-family: sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
           }
 
           .warning {
