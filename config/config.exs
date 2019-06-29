@@ -20,7 +20,8 @@ config :stripcross,
   puzzle_selector: System.get_env("PUZZLE_SELECTOR"),
   puzzle_class_mappings: System.get_env("PUZZLE_CLASS_MAPPINGS"),
   clues_selector: System.get_env("CLUES_SELECTOR"),
-  path_template: System.get_env("PATH_TEMPLATE")
+  path_template: System.get_env("PATH_TEMPLATE"),
+  date_format: System.get_env("DATE_FORMAT")
 
 config :hound, driver: "chrome_driver", browser: "chrome_headless"
 config :modest_ex, scope: :html
