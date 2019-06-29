@@ -36,6 +36,10 @@ defmodule StripcrossWeb.PageController do
     <html>
       <head>
         <style>
+          html {
+            font-family: sans-serif;
+          }
+
           .warning {
             background: pink;
             padding: 1em;
@@ -43,6 +47,7 @@ defmodule StripcrossWeb.PageController do
 
           table {
             border-collapse: collapse;
+            float: right;
           }
 
           td {
@@ -79,6 +84,29 @@ defmodule StripcrossWeb.PageController do
             top: 2px;
             left: 3px;
           }
+
+          #{clues_selector} {
+            display: flex;
+          }
+
+          #{clues_selector} div div div {
+            display: inline;
+          }
+
+          #{clues_selector} div div div:nth-child(odd) {
+            font-size: 9px;
+            font-weight: bold;
+            padding-right: 3px;
+          }
+
+          #{clues_selector} div div div:nth-child(even) {
+            font-size: 10px;
+          }
+
+          #{clues_selector} div div div:nth-child(even)::after {
+            content: '';
+            display: block;
+          }
         </style>
         #{title}
       </head>
@@ -88,9 +116,10 @@ defmodule StripcrossWeb.PageController do
     """
 
     transformed =
-      ModestEx.append(document, "body", puzzle_table)
+      ModestEx.append(document, "body", "<div class='container'></div>")
+      |> ModestEx.append(".container", puzzle_table)
       |> ModestEx.remove(".letter")
-      |> ModestEx.append("body", clues)
+      |> ModestEx.append(".container", clues)
       |> ModestEx.remove("#{clues_selector} a")
 
     puzzle_class_mappings_string = Application.get_env(:stripcross, :puzzle_class_mappings)

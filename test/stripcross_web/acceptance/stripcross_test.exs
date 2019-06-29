@@ -84,6 +84,9 @@ defmodule HoundTest do
 
         refute Hound.Matchers.element?(:css, "#ignored")
         refute Hound.Matchers.element?(:css, ".letter")
+
+        assert Hound.Matchers.element?(:css, ".container #Puzzle")
+        assert Hound.Matchers.element?(:css, ".container #Clues")
       end
     end
 
