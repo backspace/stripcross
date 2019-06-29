@@ -7,14 +7,16 @@ defmodule HoundTest do
   @page_url page_url(StripcrossWeb.Endpoint, :index)
 
   setup do
-    Hound.start_session()
+    Hound.start_session(user_agent: "Agent")
     :ok
   end
 
   describe "homepage" do
-    test "homepage loads stripped source page", _meta do
+    test "homepage loads stripped source page with user agent passthrough", _meta do
       with_mock HTTPoison,
-        get!: fn _url ->
+        get!: fn _url, [{"User-Agent", [user_agent]}] ->
+          assert user_agent == "Agent"
+
           %{
             body: """
             <html>
@@ -75,7 +77,7 @@ defmodule HoundTest do
 
     test "warns of unknown puzzle classes", _meta do
       with_mock HTTPoison,
-        get!: fn _url ->
+        get!: fn _url, _headers ->
           %{
             body: """
             <html>
@@ -107,7 +109,7 @@ defmodule HoundTest do
 
     test "navigates to today’s puzzle by default, or by date directly", _meta do
       with_mock HTTPoison,
-        get!: fn url ->
+        get!: fn url, _headers ->
           today_string = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
           today_string_url = "/#{today_string}.html"
 

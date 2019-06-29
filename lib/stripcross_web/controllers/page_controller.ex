@@ -17,7 +17,9 @@ defmodule StripcrossWeb.PageController do
 
     url = "#{base_url}#{path}"
 
-    body = HTTPoison.get!(url).body
+    user_agent = get_req_header(conn, "user-agent")
+
+    body = HTTPoison.get!(url, [{"User-Agent", user_agent}]).body
 
     title = ModestEx.find(body, "title")
 
