@@ -60,7 +60,6 @@ defmodule StripcrossWeb.PageController do
             border: 1px solid black;
             vertical-align: top;
 
-            font-family: sans-serif;
             font-size: 8px;
           }
 
