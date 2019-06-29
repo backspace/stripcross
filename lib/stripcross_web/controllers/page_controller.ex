@@ -46,8 +46,11 @@ defmodule StripcrossWeb.PageController do
           }
 
           td {
-            width: 1.25rem;
-            height: 1.25rem;
+            position: relative;
+            width: 25px;
+            height: 25px;
+
+            padding: 0;
 
             border: 1px solid black;
             vertical-align: top;
@@ -64,6 +67,17 @@ defmodule StripcrossWeb.PageController do
               white 2px,
               #888 2px
             );
+          }
+
+          td.circled *:first-child::after {
+            content: '';
+            position: absolute;
+            border-radius: 25px;
+            border: 1px solid black;
+            width: 20px;
+            height: 20px;
+            top: 2px;
+            left: 3px;
           }
         </style>
         #{title}
