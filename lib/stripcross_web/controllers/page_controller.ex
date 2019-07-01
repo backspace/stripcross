@@ -2,6 +2,9 @@ defmodule StripcrossWeb.PageController do
   use StripcrossWeb, :controller
   require Logger
 
+  @path_date_format "%Y-%m-%d"
+  @readable_date_format "%A %B %-d"
+
   def index(conn, _params) do
     HTTPoison.start()
 
@@ -9,10 +12,14 @@ defmodule StripcrossWeb.PageController do
 
     date_format = Application.get_env(:stripcross, :date_format)
 
-    path_date =
+    {path_date, request_date, is_today} =
       case conn.path_info do
-        [] -> Timex.format!(Timex.now(), date_format, :strftime)
-        [date] -> date
+        [] ->
+          date = Timex.now()
+          {Timex.format!(date, date_format, :strftime), date, true}
+
+        [date] ->
+          {date, Timex.parse!(date, @path_date_format, :strftime), false}
       end
 
     path_template = Application.get_env(:stripcross, :path_template)
@@ -50,6 +57,16 @@ defmodule StripcrossWeb.PageController do
             display: inline-block;
             font-size: 1em;
             margin: 0 0 0 1rem;
+          }
+
+          @media print {
+            a.previous, a.next {
+              display: none;
+            }
+          }
+
+          a.previous + a.next {
+            margin-left: 1rem;
           }
 
           .warning {
@@ -97,7 +114,7 @@ defmodule StripcrossWeb.PageController do
           }
 
           #{clues_selector} {
-            display: flex;
+            column-count: 3;
           }
 
           #{clues_selector} div div:nth-child(2) {
@@ -137,6 +154,50 @@ defmodule StripcrossWeb.PageController do
       |> ModestEx.append(".container", clues)
       |> ModestEx.remove("#{clues_selector} a")
       |> String.replace(" : <", "<")
+
+    yesterday =
+      request_date
+      |> Timex.subtract(Timex.Duration.from_days(1))
+
+    yesterday_path =
+      yesterday
+      |> Timex.format!(@path_date_format, :strftime)
+
+    yesterday_string =
+      yesterday
+      |> Timex.format!(@readable_date_format, :strftime)
+
+    transformed =
+      ModestEx.prepend(
+        transformed,
+        "body",
+        "<a href='#{yesterday_path}' class='previous'>« #{yesterday_string}</a>"
+      )
+
+    transformed =
+      case is_today do
+        true ->
+          transformed
+
+        false ->
+          tomorrow =
+            request_date
+            |> Timex.add(Timex.Duration.from_days(1))
+
+          tomorrow_path =
+            tomorrow
+            |> Timex.format!(@path_date_format, :strftime)
+
+          tomorrow_string =
+            tomorrow
+            |> Timex.format!(@readable_date_format, :strftime)
+
+          ModestEx.insert_after(
+            transformed,
+            "a.previous",
+            "<a href='#{tomorrow_path}' class='next'>#{tomorrow_string} »</a>"
+          )
+      end
 
     puzzle_class_mappings_string = Application.get_env(:stripcross, :puzzle_class_mappings)
 

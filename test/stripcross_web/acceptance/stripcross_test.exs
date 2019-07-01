@@ -5,6 +5,7 @@ defmodule HoundTest do
   import Mock
 
   @page_url page_url(StripcrossWeb.Endpoint, :index)
+  @path_date_format "%Y-%m-%d"
 
   setup do
     Hound.start_session(user_agent: "Agent")
@@ -127,10 +128,11 @@ defmodule HoundTest do
       end
     end
 
-    test "navigates to today’s puzzle by default, or by date directly", _meta do
+    test "navigates to today’s puzzle by default, or by date directly, with prev/next day links",
+         _meta do
       with_mock HTTPoison,
         get!: fn url, _headers ->
-          today_string = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
+          today_string = Timex.format!(Timex.now(), @path_date_format, :strftime)
           today_string_url = "/#{today_string}.html"
 
           title =
@@ -165,9 +167,45 @@ defmodule HoundTest do
 
         assert page_title() == "Today"
 
+        assert Hound.Matchers.element?(:css, "a.previous")
+
+        yesterday_string =
+          Timex.now()
+          |> Timex.subtract(Timex.Duration.from_days(1))
+          |> Timex.format!(@path_date_format, :strftime)
+
+        assert String.ends_with?(
+                 Hound.Helpers.Element.attribute_value({:css, "a.previous"}, "href"),
+                 yesterday_string
+               )
+
+        refute Hound.Matchers.element?(:css, "a.next")
+
         navigate_to(page_url(StripcrossWeb.Endpoint, :index, "2019-01-01"))
 
+        past_date = Timex.parse!("2019-01-01", @path_date_format, :strftime)
+
         assert page_title() == "/2019-01-01.html"
+
+        yesterday_string =
+          past_date
+          |> Timex.subtract(Timex.Duration.from_days(1))
+          |> Timex.format!(@path_date_format, :strftime)
+
+        assert String.ends_with?(
+                 Hound.Helpers.Element.attribute_value({:css, "a.previous"}, "href"),
+                 yesterday_string
+               )
+
+        tomorrow_string =
+          past_date
+          |> Timex.add(Timex.Duration.from_days(1))
+          |> Timex.format!(@path_date_format, :strftime)
+
+        assert String.ends_with?(
+                 Hound.Helpers.Element.attribute_value({:css, "a.next"}, "href"),
+                 tomorrow_string
+               )
       end
     end
   end
