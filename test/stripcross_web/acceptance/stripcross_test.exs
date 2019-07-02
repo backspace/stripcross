@@ -132,7 +132,7 @@ defmodule HoundTest do
          _meta do
       with_mock HTTPoison,
         get!: fn url, _headers ->
-          today_string = Timex.format!(Timex.now(), @path_date_format, :strftime)
+          today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
           today_string_url = "/#{today_string}.html"
 
           title =
@@ -170,7 +170,7 @@ defmodule HoundTest do
         assert Hound.Matchers.element?(:css, "a.previous")
 
         yesterday_string =
-          Timex.now()
+          Timex.local()
           |> Timex.subtract(Timex.Duration.from_days(1))
           |> Timex.format!(@path_date_format, :strftime)
 

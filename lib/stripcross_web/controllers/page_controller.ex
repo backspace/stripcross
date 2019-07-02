@@ -15,7 +15,7 @@ defmodule StripcrossWeb.PageController do
     {path_date, request_date, is_today} =
       case conn.path_info do
         [] ->
-          date = Timex.now()
+          date = Timex.local()
           {Timex.format!(date, date_format, :strftime), date, true}
 
         [date] ->
