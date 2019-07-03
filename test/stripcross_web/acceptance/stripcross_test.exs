@@ -181,7 +181,7 @@ defmodule HoundTest do
 
         refute Hound.Matchers.element?(:css, "a.next")
 
-        navigate_to(page_url(StripcrossWeb.Endpoint, :index, "2019-01-01"))
+        navigate_to(glob_router_url(StripcrossWeb.Endpoint, [], ["2019-01-01"]))
 
         past_date = Timex.parse!("2019-01-01", @path_date_format, :strftime)
 

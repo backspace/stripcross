@@ -17,11 +17,29 @@ defmodule StripcrossWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    get "/:date", PageController, :index
+    get "/*path", GlobRouter, []
   end
 
   # Other scopes may use custom stacks.
   # scope "/api", StripcrossWeb do
   #   pipe_through :api
   # end
+end
+
+defmodule StripcrossWeb.GlobRouter do
+  def init(opts), do: opts
+
+  def call(%Plug.Conn{request_path: path} = conn, _opts) do
+    cond do
+      Regex.match?(~r/^\/\d{4}-\d{2}-\d{2}$/, path) ->
+        to(conn, StripcrossWeb.PageController, :index)
+
+      true ->
+        raise Phoenix.Router.NoRouteError, conn: conn, router: StripcrossWeb.Router
+    end
+  end
+
+  defp to(conn, controller, action) do
+    controller.call(conn, controller.init(action))
+  end
 end
