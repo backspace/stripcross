@@ -20,6 +20,7 @@ config :stripcross,
   puzzle_selector: System.get_env("PUZZLE_SELECTOR"),
   puzzle_class_mappings: System.get_env("PUZZLE_CLASS_MAPPINGS"),
   clues_selector: System.get_env("CLUES_SELECTOR"),
+  passthrough_selectors: System.get_env("PASSTHROUGH_SELECTORS"),
   path_template: System.get_env("PATH_TEMPLATE"),
   date_format: System.get_env("DATE_FORMAT")
 

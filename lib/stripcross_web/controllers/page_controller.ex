@@ -238,6 +238,20 @@ defmodule StripcrossWeb.PageController do
           )
       end
 
+    passthrough_element_selectors =
+      Application.get_env(:stripcross, :passthrough_selectors)
+      |> String.split(" ")
+
+    transformed =
+      Enum.reduce(passthrough_element_selectors, transformed, fn selector, transformed ->
+        element_find = ModestEx.find(body, selector)
+
+        case element_find do
+          {:error, _} -> transformed
+          _ -> ModestEx.prepend(transformed, "body", element_find)
+        end
+      end)
+
     h1_find = ModestEx.find(body, "h1:first-of-type")
 
     transformed =

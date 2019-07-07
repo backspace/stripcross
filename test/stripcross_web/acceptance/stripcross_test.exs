@@ -28,6 +28,7 @@ defmodule HoundTest do
                 <div id=ignored>this is ignored</div>
                 <h1 id=Title></h1>
                 <h2 id=Subtitle></h2>
+                <div id=Passthrough>something</div>
                 <table id=Puzzle>
                   <tr><td>this is preserved</td></tr>
                   <tr>
@@ -40,6 +41,7 @@ defmodule HoundTest do
                   <div>1</div>
                   <div>A clue : <a>AN ANSWER</a></div>
                 </div>
+                <div id=OtherPassthrough></div>
                 <div>
                   <h1 id=IgnoredTitle></h1>
                   <h2 id=IgnoredSubtitle></h2>
@@ -88,6 +90,10 @@ defmodule HoundTest do
 
         assert Hound.Matchers.element?(:css, ".container #Puzzle")
         assert Hound.Matchers.element?(:css, ".container #Clues")
+
+        assert Hound.Matchers.element?(:css, "#Passthrough")
+        assert Hound.Matchers.element?(:css, "#OtherPassthrough")
+        refute Hound.Matchers.element?(:css, "#FakePassthrough")
       end
     end
 
@@ -148,6 +154,9 @@ defmodule HoundTest do
                 <title>#{title}</title>
               </head>
               <body>
+                <div id=Passthrough></div>
+                <div id=OtherPassthrough></div>
+                <div id=FakePassthrough></div>
                 <table id=Puzzle>
                   <tr>
                     <td class="something"></td>
