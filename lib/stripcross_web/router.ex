@@ -33,7 +33,7 @@ defmodule StripcrossWeb.GlobRouter do
 
   def call(%Plug.Conn{request_path: path} = conn, _opts) do
     cond do
-      Regex.match?(~r/^\/\d{4}-\d{2}-\d{2}$/, path) ->
+      Regex.match?(~r/^\/[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, path) ->
         to(conn, StripcrossWeb.PageController, :index)
 
       true ->
