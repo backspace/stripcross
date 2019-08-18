@@ -217,5 +217,34 @@ defmodule HoundTest do
                )
       end
     end
+
+    test "shows a warning when the source page contains no puzzle", _meta do
+      with_mock HTTPoison,
+        get!: fn _url, [{"User-Agent", [user_agent]}] ->
+          assert user_agent == "Agent"
+
+          %{
+            body: """
+            <html>
+              <head>
+                <title>Hello</title>
+              </head>
+              <body>
+              </body>
+            </html>
+            """
+          }
+        end,
+        start: fn -> [] end do
+        navigate_to(@page_url)
+
+        refute Hound.Matchers.element?(:css, "#Puzzle")
+
+        assert String.contains?(
+                  Hound.Helpers.Element.visible_text({:css, "p"}),
+                  "The source page didn’t contain a puzzle! Is the date correct?"
+                )
+      end
+    end  
   end
 end
