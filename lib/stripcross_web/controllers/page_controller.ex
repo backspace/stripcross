@@ -106,6 +106,10 @@ defmodule StripcrossWeb.PageController do
                   #888 2px
                 );
               }
+
+              td.shaded {
+                background: #d3d3d3;
+              }
     
               td.circled *:first-child::after {
                 content: '';
