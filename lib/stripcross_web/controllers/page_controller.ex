@@ -159,11 +159,20 @@ defmodule StripcrossWeb.PageController do
         transformed =
           ModestEx.append(document, "body", "<div class='container'></div>")
           |> ModestEx.append(".container", puzzle_table)
-          |> ModestEx.remove(".letter")
           |> ModestEx.append(".container", clues)
           |> ModestEx.remove("#{clues_selector} a")
           |> String.replace(" : <", "<")
+        
+        remove_selectors_string = Application.get_env(:stripcross, :remove_selectors)
     
+        remove_selectors =
+          String.split(remove_selectors_string, " ")
+        
+        transformed =
+          Enum.reduce(remove_selectors, transformed, fn selector, transformed ->
+            ModestEx.remove(transformed, selector)
+          end)
+
         yesterday =
           request_date
           |> Timex.subtract(Timex.Duration.from_days(1))
