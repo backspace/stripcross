@@ -15,40 +15,43 @@ defmodule HoundTest do
   describe "homepage" do
     test "homepage loads stripped source page with user agent passthrough", _meta do
       with_mock HTTPoison,
-        get!: fn _url, [{"User-Agent", [user_agent]}] ->
+        get: fn _url, [{"User-Agent", [user_agent]}] ->
           assert user_agent == "Agent"
-
-          %{
-            body: """
-            <html>
-              <head>
-                <title>Hello</title>
-              </head>
-              <body>
-                <div id=ignored>this is ignored</div>
-                <h1 id=Title></h1>
-                <h2 id=Subtitle></h2>
-                <div id=Passthrough>something</div>
-                <table id=Puzzle>
-                  <tr><td>this is preserved</td></tr>
-                  <tr>
-                    <td class=letter>this is removed</td>
-                    <td class="something"></td>
-                    <td class="something-else"></td>
-                  </tr>
-                </table>
-                <div id=Clues>
-                  <div>1</div>
-                  <div>A clue : <a>AN ANSWER</a></div>
-                </div>
-                <div id=OtherPassthrough></div>
-                <div>
-                  <h1 id=IgnoredTitle></h1>
-                  <h2 id=IgnoredSubtitle></h2>
-                </div>
-              </body>
-            </html>
-            """
+          {
+            :ok,
+            %{
+              status_code: 200,
+              body: """
+              <html>
+                <head>
+                  <title>Hello</title>
+                </head>
+                <body>
+                  <div id=ignored>this is ignored</div>
+                  <h1 id=Title></h1>
+                  <h2 id=Subtitle></h2>
+                  <div id=Passthrough>something</div>
+                  <table id=Puzzle>
+                    <tr><td>this is preserved</td></tr>
+                    <tr>
+                      <td class=letter>this is removed</td>
+                      <td class="something"></td>
+                      <td class="something-else"></td>
+                    </tr>
+                  </table>
+                  <div id=Clues>
+                    <div>1</div>
+                    <div>A clue : <a>AN ANSWER</a></div>
+                  </div>
+                  <div id=OtherPassthrough></div>
+                  <div>
+                    <h1 id=IgnoredTitle></h1>
+                    <h2 id=IgnoredSubtitle></h2>
+                  </div>
+                </body>
+              </html>
+              """
+            }
           }
         end,
         start: fn -> [] end do
@@ -99,28 +102,32 @@ defmodule HoundTest do
 
     test "warns of unknown puzzle classes and ignores non-following h2s", _meta do
       with_mock HTTPoison,
-        get!: fn _url, _headers ->
-          %{
-            body: """
-            <html>
-              <head>
-                <title>Hello</title>
-              </head>
-              <body>
-                <h1 id=Title></h1>
-                <table id=Puzzle>
-                  <tr>
-                    <td class="something"></td>
-                    <td class="unknown"></td>
-                    <td class="unknown"></td>
-                  </tr>
-                </table>
-                <h2 id=NonSubtitle></h2>
-                <div id=Clues>
-                </div>
-              </body>
-            </html>
-            """
+        get: fn _url, _headers ->
+          {
+            :ok,
+            %{
+              status_code: 200,
+              body: """
+              <html>
+                <head>
+                  <title>Hello</title>
+                </head>
+                <body>
+                  <h1 id=Title></h1>
+                  <table id=Puzzle>
+                    <tr>
+                      <td class="something"></td>
+                      <td class="unknown"></td>
+                      <td class="unknown"></td>
+                    </tr>
+                  </table>
+                  <h2 id=NonSubtitle></h2>
+                  <div id=Clues>
+                  </div>
+                </body>
+              </html>
+              """
+            }
           }
         end,
         start: fn -> [] end do
@@ -137,7 +144,7 @@ defmodule HoundTest do
     test "navigates to today’s puzzle by default, or by date directly, with prev/next day links",
          _meta do
       with_mock HTTPoison,
-        get!: fn url, _headers ->
+        get: fn url, _headers ->
           today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
           today_string_url = "/#{today_string}.html"
 
@@ -147,28 +154,32 @@ defmodule HoundTest do
               _ -> url
             end
 
-          %{
-            body: """
-            <html>
-              <head>
-                <title>#{title}</title>
-              </head>
-              <body>
-                <div id=Passthrough></div>
-                <div id=OtherPassthrough></div>
-                <div id=FakePassthrough></div>
-                <table id=Puzzle>
-                  <tr>
-                    <td class="something"></td>
-                    <td class="unknown"></td>
-                    <td class="unknown"></td>
-                  </tr>
-                </table>
-                <div id=Clues>
-                </div>
-              </body>
-            </html>
-            """
+          {
+            :ok,
+            %{
+              status_code: 200,
+              body: """
+              <html>
+                <head>
+                  <title>#{title}</title>
+                </head>
+                <body>
+                  <div id=Passthrough></div>
+                  <div id=OtherPassthrough></div>
+                  <div id=FakePassthrough></div>
+                  <table id=Puzzle>
+                    <tr>
+                      <td class="something"></td>
+                      <td class="unknown"></td>
+                      <td class="unknown"></td>
+                    </tr>
+                  </table>
+                  <div id=Clues>
+                  </div>
+                </body>
+              </html>
+              """
+            }
           }
         end,
         start: fn -> [] end do
@@ -220,19 +231,23 @@ defmodule HoundTest do
 
     test "shows a warning when the source page contains no puzzle", _meta do
       with_mock HTTPoison,
-        get!: fn _url, [{"User-Agent", [user_agent]}] ->
+        get: fn _url, [{"User-Agent", [user_agent]}] ->
           assert user_agent == "Agent"
 
-          %{
-            body: """
-            <html>
-              <head>
-                <title>Hello</title>
-              </head>
-              <body>
-              </body>
-            </html>
-            """
+          {
+            :ok,
+            %{
+              status_code: 200,
+              body: """
+              <html>
+                <head>
+                  <title>Hello</title>
+                </head>
+                <body>
+                </body>
+              </html>
+              """
+            }
           }
         end,
         start: fn -> [] end do
@@ -243,6 +258,63 @@ defmodule HoundTest do
         assert String.contains?(
                   Hound.Helpers.Element.visible_text({:css, "p"}),
                   "The source page didn’t contain a puzzle! Is the date correct?"
+                )
+      end
+    end  
+
+    test "shows the status code when not 200", _meta do
+      with_mock HTTPoison,
+        get: fn _url, [{"User-Agent", [user_agent]}] ->
+          assert user_agent == "Agent"
+
+          {
+            :ok,
+            %{
+              status_code: 503,
+              body: """
+              <html>
+                <head>
+                  <title>503</title>
+                </head>
+                <body>
+                </body>
+              </html>
+              """
+            }
+          }
+        end,
+        start: fn -> [] end do
+        navigate_to(@page_url)
+
+        refute Hound.Matchers.element?(:css, "#Puzzle")
+
+        assert String.contains?(
+                  Hound.Helpers.Element.visible_text({:css, "p"}),
+                  "The source site returned an unexpected 503 code."
+                )
+      end
+    end  
+
+    test "shows an error when received", _meta do
+      with_mock HTTPoison,
+        get: fn _url, [{"User-Agent", [user_agent]}] ->
+          assert user_agent == "Agent"
+
+          {
+            :error,
+            %{
+              reason: "error reason"
+            }
+          }
+        end,
+        start: fn -> [] end do
+        navigate_to(@page_url)
+
+        refute Hound.Matchers.element?(:css, "#Puzzle")
+
+        assert String.contains?(
+                  Hound.Helpers.Element.visible_text({:css, "p"}),
+                  "The source site returned an error: error reason"
                 )
       end
     end  
