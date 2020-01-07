@@ -8,7 +8,8 @@
 use Mix.Config
 
 config :stripcross, Stripcross.Cache,
-  gc_interval: 86_400 # 24 hrs
+  gc_interval: 86_400, # 24 hrs
+  conn_opts: [ url: System.get_env("REDIS_URL") ]
 
 # Configures the endpoint
 config :stripcross, StripcrossWeb.Endpoint,
