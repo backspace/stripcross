@@ -9,6 +9,7 @@ defmodule HoundTest do
 
   setup do
     Hound.start_session(user_agent: "Agent")
+    Stripcross.Cache.flush()
     :ok
   end
 
@@ -227,6 +228,39 @@ defmodule HoundTest do
                  tomorrow_string
                )
       end
+    end
+
+    test "serves a cached page when available with prev/next day links", _meta do
+      past_date = Timex.parse!("2019-01-01", @path_date_format, :strftime)
+      past_date_url = "/2019-01-01.html"
+      Stripcross.Cache.set(past_date_url, "<h1>title</h1><p class='container'>cached</p>")
+
+      navigate_to(glob_router_url(StripcrossWeb.Endpoint, [], ["2019-01-01"]))
+
+      assert String.contains?(
+        Hound.Helpers.Element.visible_text({:css, "p"}),
+        "cached"
+      )
+
+      yesterday_string =
+        past_date
+        |> Timex.subtract(Timex.Duration.from_days(1))
+        |> Timex.format!(@path_date_format, :strftime)
+
+      assert String.ends_with?(
+              Hound.Helpers.Element.attribute_value({:css, "h1 + a.previous"}, "href"),
+              yesterday_string
+            )
+
+      tomorrow_string =
+        past_date
+        |> Timex.add(Timex.Duration.from_days(1))
+        |> Timex.format!(@path_date_format, :strftime)
+
+      assert String.ends_with?(
+              Hound.Helpers.Element.attribute_value({:css, "a.next"}, "href"),
+              tomorrow_string
+            )
     end
 
     test "shows a warning when the source page contains no puzzle", _meta do

@@ -7,6 +7,9 @@
 # General application configuration
 use Mix.Config
 
+config :stripcross, Stripcross.Cache,
+  gc_interval: 86_400 # 24 hrs
+
 # Configures the endpoint
 config :stripcross, StripcrossWeb.Endpoint,
   url: [host: "localhost"],
