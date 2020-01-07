@@ -9,7 +9,8 @@ defmodule Stripcross.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      StripcrossWeb.Endpoint
+      StripcrossWeb.Endpoint,
+      Stripcross.Cache
       # Starts a worker by calling: Stripcross.Worker.start_link(arg)
       # {Stripcross.Worker, arg},
     ]

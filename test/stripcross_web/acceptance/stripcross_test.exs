@@ -9,6 +9,7 @@ defmodule HoundTest do
 
   setup do
     Hound.start_session(user_agent: "Agent")
+    Stripcross.Cache.flush()
     :ok
   end
 
@@ -227,6 +228,19 @@ defmodule HoundTest do
                  tomorrow_string
                )
       end
+    end
+
+    test "serves a cached page when available", _meta do
+      today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
+      today_string_url = "/#{today_string}.html"
+      Stripcross.Cache.set(today_string_url, "<p>cached</p>")
+
+      navigate_to(@page_url)
+
+      assert String.contains?(
+        Hound.Helpers.Element.visible_text({:css, "p"}),
+        "cached"
+      )
     end
 
     test "shows a warning when the source page contains no puzzle", _meta do

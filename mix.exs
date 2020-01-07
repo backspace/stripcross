@@ -44,6 +44,7 @@ defmodule Stripcross.MixProject do
       {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
       {:mock, "~> 0.3.0", only: :test},
       {:modest_ex, "~> 1.0.4"},
+      {:nebulex, "~> 1.1"},
       {:timex, "~> 3.5"}
     ]
   end
