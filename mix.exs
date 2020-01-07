@@ -45,6 +45,7 @@ defmodule Stripcross.MixProject do
       {:mock, "~> 0.3.0", only: :test},
       {:modest_ex, "~> 1.0.4"},
       {:nebulex, "~> 1.1"},
+      {:nebulex_redis_adapter, "~> 1.1"},
       {:sentry, "~> 7.0"},
       {:timex, "~> 3.5"}
     ]
