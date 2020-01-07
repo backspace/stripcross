@@ -29,8 +29,11 @@ defmodule StripcrossWeb.PageController do
 
     case Stripcross.Cache.has_key?(url) do
       true ->
+        cached_with_links = Stripcross.Cache.get(url)
+        |> add_navigation_links(request_date, is_today)
+
         conn
-        |> html(Stripcross.Cache.get(url))
+        |> html(cached_with_links)
       false ->
         user_agent = get_req_header(conn, "user-agent")
 
@@ -177,50 +180,6 @@ defmodule StripcrossWeb.PageController do
                   Enum.reduce(remove_selectors, transformed, fn selector, transformed ->
                     ModestEx.remove(transformed, selector)
                   end)
-
-                yesterday =
-                  request_date
-                  |> Timex.subtract(Timex.Duration.from_days(1))
-            
-                yesterday_path =
-                  yesterday
-                  |> Timex.format!(@path_date_format, :strftime)
-            
-                yesterday_string =
-                  yesterday
-                  |> Timex.format!(@readable_date_format, :strftime)
-            
-                transformed =
-                  ModestEx.prepend(
-                    transformed,
-                    "body",
-                    "<a href='#{yesterday_path}' class='previous'>« #{yesterday_string}</a>"
-                  )
-            
-                transformed =
-                  case is_today do
-                    true ->
-                      transformed
-            
-                    false ->
-                      tomorrow =
-                        request_date
-                        |> Timex.add(Timex.Duration.from_days(1))
-            
-                      tomorrow_path =
-                        tomorrow
-                        |> Timex.format!(@path_date_format, :strftime)
-            
-                      tomorrow_string =
-                        tomorrow
-                        |> Timex.format!(@readable_date_format, :strftime)
-            
-                      ModestEx.insert_after(
-                        transformed,
-                        "a.previous",
-                        "<a href='#{tomorrow_path}' class='next'>#{tomorrow_string} »</a>"
-                      )
-                  end
             
                 puzzle_class_mappings_string = Application.get_env(:stripcross, :puzzle_class_mappings)
             
@@ -294,7 +253,9 @@ defmodule StripcrossWeb.PageController do
                   end
             
                 Stripcross.Cache.set(url, transformed)
-                
+
+                transformed = add_navigation_links(transformed, request_date, is_today)
+
                 conn
                 |> html(transformed)
                 end
@@ -311,4 +272,49 @@ defmodule StripcrossWeb.PageController do
 
   defp self_or_first(array) when is_list(array), do: hd(array)
   defp self_or_first(self), do: self
+
+  defp add_navigation_links(transformed, request_date, is_today) do
+    yesterday =
+      request_date
+      |> Timex.subtract(Timex.Duration.from_days(1))
+
+    yesterday_path =
+      yesterday
+      |> Timex.format!(@path_date_format, :strftime)
+
+    yesterday_string =
+      yesterday
+      |> Timex.format!(@readable_date_format, :strftime)
+
+    transformed =
+      ModestEx.insert_before(
+        transformed,
+        ".container",
+        "<a href='#{yesterday_path}' class='previous'>« #{yesterday_string}</a>"
+      )
+
+    case is_today do
+      true ->
+        transformed
+
+      false ->
+        tomorrow =
+          request_date
+          |> Timex.add(Timex.Duration.from_days(1))
+
+        tomorrow_path =
+          tomorrow
+          |> Timex.format!(@path_date_format, :strftime)
+
+        tomorrow_string =
+          tomorrow
+          |> Timex.format!(@readable_date_format, :strftime)
+
+        ModestEx.insert_after(
+          transformed,
+          "a.previous",
+          "<a href='#{tomorrow_path}' class='next'>#{tomorrow_string} »</a>"
+        )
+    end
+  end
 end
