@@ -19,4 +19,4 @@ config :stripcross,
   passthrough_selectors: "#Passthrough #OtherPassthrough #FakePassthrough",
   remove_selectors: ".letter",
   path_template: "FORMATTED_DATE.html",
-  date_format: "%Y-%m-%d"
+  source_date_format: "%Y%m%d"
