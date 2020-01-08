@@ -27,7 +27,7 @@ config :stripcross,
   passthrough_selectors: System.get_env("PASSTHROUGH_SELECTORS"),
   remove_selectors: System.get_env("REMOVE_SELECTORS"),
   path_template: System.get_env("PATH_TEMPLATE"),
-  date_format: System.get_env("DATE_FORMAT")
+  source_date_format: System.get_env("DATE_FORMAT")
 
 config :hound, driver: "chrome_driver", browser: "chrome_headless"
 config :modest_ex, scope: :html

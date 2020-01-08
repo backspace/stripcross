@@ -10,17 +10,18 @@ defmodule StripcrossWeb.PageController do
 
     base_url = Application.get_env(:stripcross, :base_host)
 
-    date_format = Application.get_env(:stripcross, :date_format)
+    source_date_format = Application.get_env(:stripcross, :source_date_format)
 
     {path_date, request_date, is_today} =
       case conn.path_info do
         [] ->
           date = Timex.local()
-          {Timex.format!(date, date_format, :strftime), date, true}
+          {Timex.format!(date, source_date_format, :strftime), date, true}
 
         [path_date] ->
           parsed_date = Timex.parse!(path_date, @path_date_format, :strftime)
-          {path_date, parsed_date, Timex.equal?(Timex.now(), parsed_date, :day)}
+          source_formatted_date_string = Timex.format!(parsed_date, source_date_format, :strftime)
+          {source_formatted_date_string, parsed_date, Timex.equal?(Timex.now(), parsed_date, :day)}
       end
 
     path_template = Application.get_env(:stripcross, :path_template)

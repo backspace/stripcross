@@ -144,9 +144,11 @@ defmodule HoundTest do
 
     test "navigates to today’s puzzle by default, or by date directly, with prev/next day links",
          _meta do
+      source_date_format = Application.get_env(:stripcross, :source_date_format)
+
       with_mock HTTPoison,
         get: fn url, _headers ->
-          today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
+          today_string = Timex.format!(Timex.local(), source_date_format, :strftime)
           today_string_url = "/#{today_string}.html"
 
           title =
@@ -206,7 +208,7 @@ defmodule HoundTest do
 
         past_date = Timex.parse!("2019-01-01", @path_date_format, :strftime)
 
-        assert page_title() == "/2019-01-01.html"
+        assert page_title() == "/20190101.html"
 
         yesterday_string =
           past_date
@@ -232,8 +234,8 @@ defmodule HoundTest do
 
     test "serves a cached page when available with prev/next day links", _meta do
       past_date = Timex.parse!("2019-01-01", @path_date_format, :strftime)
-      past_date_url = "/2019-01-01.html"
-      Stripcross.Cache.set(past_date_url, "<h1>title</h1><p class='container'>cached</p>")
+      past_date_source_url = "/20190101.html"
+      Stripcross.Cache.set(past_date_source_url, "<h1>title</h1><p class='container'>cached</p>")
 
       navigate_to(glob_router_url(StripcrossWeb.Endpoint, [], ["2019-01-01"]))
 
@@ -265,8 +267,9 @@ defmodule HoundTest do
 
     test "doesn’t add a next link when the visited date is today", _meta do
       today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
-      today_string_url = "/#{today_string}.html"
-      Stripcross.Cache.set(today_string_url, "<h1>title</h1><p class='container'>cached</p>")
+      source_date_format = Application.get_env(:stripcross, :source_date_format)
+      today_string_source_url = "/#{Timex.format!(Timex.local(), source_date_format, :strftime)}.html"
+      Stripcross.Cache.set(today_string_source_url, "<h1>title</h1><p class='container'>cached</p>")
 
       navigate_to(glob_router_url(StripcrossWeb.Endpoint, [], [today_string]))
 
