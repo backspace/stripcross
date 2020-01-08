@@ -263,6 +263,17 @@ defmodule HoundTest do
             )
     end
 
+    test "doesn’t add a next link when the visited date is today", _meta do
+      today_string = Timex.format!(Timex.local(), @path_date_format, :strftime)
+      today_string_url = "/#{today_string}.html"
+      Stripcross.Cache.set(today_string_url, "<h1>title</h1><p class='container'>cached</p>")
+
+      navigate_to(glob_router_url(StripcrossWeb.Endpoint, [], [today_string]))
+
+      assert Hound.Matchers.element?(:css, "a.previous")
+      refute Hound.Matchers.element?(:css, "a.next")
+    end
+
     test "shows a warning when the source page contains no puzzle", _meta do
       with_mock HTTPoison,
         get: fn _url, [{"User-Agent", [user_agent]}] ->
