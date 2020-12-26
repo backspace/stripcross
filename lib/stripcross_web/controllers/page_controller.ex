@@ -5,12 +5,13 @@ defmodule StripcrossWeb.PageController do
   @path_date_format "%Y-%m-%d"
   @readable_date_format "%A %B %-d"
 
-  def index(conn, _params) do
+  def index(conn, params) do
     HTTPoison.start()
 
     base_url = Application.get_env(:stripcross, :base_host)
 
     source_date_format = Application.get_env(:stripcross, :source_date_format)
+    Logger.error(conn.path_info)
 
     {path_date, request_date, is_today} =
       case conn.path_info do
@@ -29,10 +30,15 @@ defmodule StripcrossWeb.PageController do
 
     url = "#{base_url}#{path}"
 
+    hide_puzzle = Map.has_key?(params, "hide-puzzle")
+    Logger.error "has key? #{Stripcross.Cache.has_key?(url)} url: #{url}"
+    Logger.error "haspu: #{hide_puzzle}"
+
     case Stripcross.Cache.has_key?(url) do
       true ->
         cached_with_links = Stripcross.Cache.get(url)
-        |> add_navigation_links(request_date, is_today)
+        |> add_navigation_links(request_date, is_today, hide_puzzle)
+        |> add_body_class(hide_puzzle)
 
         conn
         |> html(cached_with_links)
@@ -46,8 +52,12 @@ defmodule StripcrossWeb.PageController do
             puzzle_selector = Application.get_env(:stripcross, :puzzle_selector)
             puzzle_table = ModestEx.find(body, puzzle_selector)
 
+            Logger.error("selector #{puzzle_selector}")
+            Logger.error("body? #{body}")
+
             case puzzle_table do
               {:error, _} ->
+                Logger.error "error!!!!"
                 conn
                 |> html("<p>The source page didn’t contain a puzzle! Is the date correct?</p>")
               _ ->
@@ -75,11 +85,15 @@ defmodule StripcrossWeb.PageController do
                       }
             
                       @media print {
-                        a.previous, a.next {
+                        a.puzzle-toggle, a.previous, a.next {
                           display: none;
                         }
                       }
-            
+
+                      a.puzzle-toggle {
+                        margin-right: 1rem;
+                      }
+
                       a.previous + a.next {
                         margin-left: 1rem;
                       }
@@ -157,6 +171,14 @@ defmodule StripcrossWeb.PageController do
                       #{clues_selector} div div div:nth-child(even)::after {
                         content: '';
                         display: block;
+                      }
+
+                      body.hide-puzzle table {
+                        display: none;
+                      }
+
+                      body.hide-puzzle #{clues_selector} {
+                        column-count: 2;
                       }
                     </style>
                     #{title}
@@ -253,10 +275,13 @@ defmodule StripcrossWeb.PageController do
                         _ -> ModestEx.insert_after(with_h1, "h1", self_or_first(h2_find))
                       end
                   end
+                
+                Logger.error "transformed??? #{transformed}"
             
                 Stripcross.Cache.set(url, transformed)
 
-                transformed = add_navigation_links(transformed, request_date, is_today)
+                transformed = add_navigation_links(transformed, request_date, is_today, hide_puzzle)
+                |> add_body_class(hide_puzzle)
 
                 conn
                 |> html(transformed)
@@ -275,7 +300,8 @@ defmodule StripcrossWeb.PageController do
   defp self_or_first(array) when is_list(array), do: hd(array)
   defp self_or_first(self), do: self
 
-  defp add_navigation_links(transformed, request_date, is_today) do
+  defp add_navigation_links(transformed, request_date, is_today, hide_puzzle) do
+    Logger.error("ANL #{request_date} #{is_today} #{hide_puzzle}")
     yesterday =
       request_date
       |> Timex.subtract(Timex.Duration.from_days(1))
@@ -293,6 +319,20 @@ defmodule StripcrossWeb.PageController do
         transformed,
         ".container",
         "<a href='#{yesterday_path}' class='previous'>« #{yesterday_string}</a>"
+      )
+    
+    Logger.error "meeeeeeeee"
+    Logger.error hide_puzzle
+    
+    show_hide_puzzle_link = if hide_puzzle, do: "<a class='puzzle-toggle' href='?'>Show puzzle</a>", else: "<a class='puzzle-toggle' href='?hide-puzzle'>Hide puzzle</a>"
+    Logger.error "suteaohusntoehuasn"
+    Logger.error show_hide_puzzle_link
+    
+    transformed =
+      ModestEx.insert_before(
+        transformed,
+        "a.previous",
+        show_hide_puzzle_link
       )
 
     case is_today do
@@ -317,6 +357,16 @@ defmodule StripcrossWeb.PageController do
           "a.previous",
           "<a href='#{tomorrow_path}' class='next'>#{tomorrow_string} »</a>"
         )
+    end
+  end
+
+  defp add_body_class(transformed, hide_puzzle) do
+    case hide_puzzle do
+      true ->
+        ModestEx.set_attribute(transformed, "body", "class", "hide-puzzle")
+
+      false ->
+        transformed
     end
   end
 end
