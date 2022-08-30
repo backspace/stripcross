@@ -8,15 +8,16 @@
 use Mix.Config
 
 config :stripcross, Stripcross.Cache,
-  gc_interval: 86_400, # 24 hrs
-  conn_opts: [ url: System.get_env("REDIS_URL") ]
+  # 24 hrs
+  gc_interval: 86_400,
+  conn_opts: [url: System.get_env("REDIS_URL")]
 
 # Configures the endpoint
 config :stripcross, StripcrossWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "mrXbcLGLphocTi0X2mvaMhCRf8oSqxkQHUUBEHwT1/QOzVezHJnpZVlvRlTX4ahV",
   render_errors: [view: StripcrossWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Stripcross.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: Stripcross.PubSub
 
 config :stripcross, base_host: System.get_env("BASE_HOST")
 
