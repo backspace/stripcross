@@ -1,18 +1,8 @@
-import cors from '@koa/cors';
 import http from 'http';
-import Koa from 'koa';
-import bodyParser from 'koa-bodyparser';
-import { appConfig, bodyParserConfig, corsConfig } from './config';
-import { router } from './router';
+import { createServer } from './server';
+import { appConfig } from './config';
 
-const app = new Koa();
-
-// Apply Middleware
-app.use(bodyParser(bodyParserConfig));
-app.use(cors(corsConfig));
-
-// Apply routes
-app.use(router.routes());
+const app = createServer();
 
 const httpServer = http.createServer(app.callback());
 
