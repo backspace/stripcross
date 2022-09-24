@@ -56,7 +56,7 @@ const register = (router: Router) => {
         </html>
     `;
 
-    ctx.body = newDocumentString;
+    ctx.body = newDocumentString.replace(/ :/g, ':');
   });
 };
 
