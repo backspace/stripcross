@@ -1,15 +1,15 @@
 {
-  "name": "@south-paw/koa-typescript",
+  "name": "stripcross",
   "version": "0.0.1",
-  "description": "Simple boilerplate for a Koa server with Typescript, ESLint, Prettier and Jest.",
+  "description": "A server to reformat crosswords",
   "keywords": [],
-  "homepage": "https://github.com/South-Paw/koa-typescript",
-  "bugs": "https://github.com/South-Paw/koa-typescript/issues",
+  "homepage": "https://github.com/backspace/stripcross",
+  "bugs": "https://github.com/backspace/stripcross/issues",
   "license": "MIT",
   "author": {
-    "name": "Alex Gabites",
-    "email": "hello@southpaw.co.nz",
-    "url": "http://southpaw.co.nz/"
+    "name": "Buck Doyle",
+    "email": "b@chromatin.ca",
+    "url": "https://chromatin.ca/"
   },
   "files": [
     "dist/*"
@@ -17,7 +17,7 @@
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/South-Paw/koa-typescript.git"
+    "url": "https://github.com/backspace/stripcross.git"
   },
   "scripts": {
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn ts:watch\" \"yarn start:watch\"",
