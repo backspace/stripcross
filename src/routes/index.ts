@@ -35,8 +35,9 @@ const register = (router: Router) => {
 
     const original = await fetch(`${process.env.BASE_HOST}${requestPath}`);
     const html = await original.text();
+    const htmlWithoutColons = html.replace(/ : </g, '<');
 
-    const { document } = new JSDOM(html).window;
+    const { document } = new JSDOM(htmlWithoutColons).window;
 
     process.env.REMOVE_SELECTORS?.split(' ').forEach(selector => {
       document.querySelectorAll(selector).forEach(element => element.remove());
@@ -66,7 +67,7 @@ const register = (router: Router) => {
         </html>
     `;
 
-    ctx.body = newDocumentString.replace(/ :/g, ':');
+    ctx.body = newDocumentString;
   });
 };
 
