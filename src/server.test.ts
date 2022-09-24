@@ -2,7 +2,10 @@ import fetchMock from 'jest-fetch-mock';
 import request from 'supertest';
 import type { Server } from 'http';
 import { JSDOM } from 'jsdom';
+import { format } from 'date-fns';
 import { createServer } from './server';
+
+const DATE_FORMAT = process.env.DATE_FORMAT!;
 
 fetchMock.enableMocks();
 
@@ -48,8 +51,9 @@ describe('stripcross', () => {
     `);
 
     const response = await request(server).get('/');
-
     const { document } = new JSDOM(response.text).window;
+
+    expect(fetchMock.mock.calls[0][0]).toContain(format(new Date(), DATE_FORMAT));
 
     expect(document.querySelector('#Title')).not.toBeNull();
     expect(document.querySelector('#Subtitle')).not.toBeNull();
@@ -59,5 +63,8 @@ describe('stripcross', () => {
 
     expect(document.querySelector('#preserved')).not.toBeNull();
     expect(document.querySelector('#preservedclue')).not.toBeNull();
+
+    await request(server).get('/2019-01-01');
+    expect(fetchMock.mock.calls[1][0]).toEqual('/20190101.html');
   });
 });

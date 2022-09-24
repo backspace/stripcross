@@ -1,6 +1,26 @@
 import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
+import { format, parse } from 'date-fns';
 import 'cross-fetch';
+
+const DATE_FORMAT = process.env.DATE_FORMAT!;
+const PATH_TEMPLATE = process.env.PATH_TEMPLATE!;
+
+const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
+
+function determineRequestPath(originPath: string) {
+  let requestDateString;
+
+  if (originPath === '/') {
+    requestDateString = format(new Date(), DATE_FORMAT);
+  } else {
+    const originDateString = originPath.substring(1);
+    const parsedDate = parse(originDateString, STRIPCROSS_PATH_DATE_FORMAT, new Date());
+    requestDateString = format(parsedDate, DATE_FORMAT);
+  }
+
+  return PATH_TEMPLATE.replace('FORMATTED_DATE', requestDateString);
+}
 
 function extractSelector(document: Document, selector: string) {
   const element = document.querySelector(selector);
@@ -8,10 +28,11 @@ function extractSelector(document: Document, selector: string) {
 }
 
 const register = (router: Router) => {
-  router.get('/', async ctx => {
+  router.get('/*', async ctx => {
+    const requestPath = determineRequestPath(ctx.request.path);
     ctx.status = 200;
 
-    const original = await fetch(`${process.env.BASE_HOST}`);
+    const original = await fetch(`${process.env.BASE_HOST}${requestPath}`);
     const html = await original.text();
 
     const { document } = new JSDOM(html).window;
