@@ -1,3 +1,9 @@
+# Stripcross
+
+This reformats pages from a crossword site.
+
+Below is the template documentation.
+
 # @south-paw/koa-typescript
 
 ♨️ Simple boilerplate for a Koa server with Typescript, ESLint, Prettier and Jest.
