@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
 import { format, parse } from 'date-fns';
 import 'cross-fetch';
+import style from '../style';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
 const PATH_TEMPLATE = process.env.PATH_TEMPLATE!;
@@ -43,6 +44,9 @@ const register = (router: Router) => {
 
     const newDocumentString = `
         <html>
+            <head>
+              <style>${style()}</style>
+            </head>
             <body>
                 ${extractSelector(document, 'h1:first-of-type')}
                 ${extractSelector(document, 'h1 + h2:first-of-type')}
