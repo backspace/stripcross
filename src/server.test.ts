@@ -64,6 +64,12 @@ describe('stripcross', () => {
     expect(document.querySelector('#preserved')).not.toBeNull();
     expect(document.querySelector('#preservedclue')).not.toBeNull();
 
+    expect(document.querySelector('.something')).toBeNull();
+    expect(document.querySelector('.transformed-something')).not.toBeNull();
+
+    expect(document.querySelector('.something-else')).toBeNull();
+    expect(document.querySelector('.transformed-something-else')).not.toBeNull();
+
     expect(response.text).not.toContain('A clue :');
 
     await request(server).get('/2019-01-01');

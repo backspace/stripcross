@@ -42,6 +42,14 @@ const register = (router: Router) => {
       document.querySelectorAll(selector).forEach(element => element.remove());
     });
 
+    process.env.PUZZLE_CLASS_MAPPINGS?.split(' ').forEach(selector => {
+      const [oldClass, newClass] = selector.split(':');
+      document.querySelectorAll(`.${oldClass}`).forEach(element => {
+        element.classList.remove(oldClass);
+        element.classList.add(newClass);
+      });
+    });
+
     const newDocumentString = `
         <html>
             <head>
