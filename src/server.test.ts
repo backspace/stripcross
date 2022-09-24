@@ -70,6 +70,8 @@ describe('stripcross', () => {
     expect(document.querySelector('.something-else')).toBeNull();
     expect(document.querySelector('.transformed-something-else')).not.toBeNull();
 
+    expect(document.querySelector('#Clues a')).toBeNull();
+
     expect(response.text).not.toContain('A clue :');
 
     await request(server).get('/2019-01-01');

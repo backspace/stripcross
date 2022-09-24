@@ -50,6 +50,8 @@ const register = (router: Router) => {
       });
     });
 
+    document.querySelectorAll(`${process.env.CLUES_SELECTOR} a`).forEach(element => element.remove());
+
     const newDocumentString = `
         <html>
             <head>
