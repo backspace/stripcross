@@ -2,8 +2,12 @@ import fetchMock from 'jest-fetch-mock';
 import request from 'supertest';
 import type { Server } from 'http';
 import { JSDOM } from 'jsdom';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import { createServer } from './server';
+
+// FIXME what doesn’t importing these work
+const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
+const STRIPCROSS_LINK_DATE_FORMAT = 'EEEE MMMM d';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
 
@@ -59,6 +63,14 @@ describe('stripcross', () => {
     expect(document.querySelector('#hide-puzzle')).not.toBeNull();
     expect(document.querySelector('#show-puzzle')).toBeNull();
 
+    const previousLink = document.querySelector('a.previous');
+    const previousDate = addDays(new Date(), -1);
+
+    expect(previousLink?.innerHTML).toContain(format(previousDate, STRIPCROSS_LINK_DATE_FORMAT));
+    expect(previousLink?.attributes.getNamedItem('href')!.value).toBe(format(previousDate, STRIPCROSS_PATH_DATE_FORMAT));
+
+    expect(document.querySelector('a.next')).toBeNull();
+
     expect(document.querySelector('#Title')).not.toBeNull();
     expect(document.querySelector('#Subtitle')).not.toBeNull();
 
@@ -91,5 +103,11 @@ describe('stripcross', () => {
     expect(document.querySelector('body.hide-puzzle')).not.toBeNull();
     expect(document.querySelector('#hide-puzzle')).toBeNull();
     expect(document.querySelector('#show-puzzle')).not.toBeNull();
+
+    const nextLink = document.querySelector('a.next');
+    const nextDate = addDays(new Date(2019, 0, 1), 1);
+
+    expect(nextLink?.innerHTML).toContain(format(nextDate, STRIPCROSS_LINK_DATE_FORMAT));
+    expect(nextLink?.attributes.getNamedItem('href')!.value).toBe(format(nextDate, STRIPCROSS_PATH_DATE_FORMAT));
   });
 });

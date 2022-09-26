@@ -1,26 +1,33 @@
 import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
-import { format, parse } from 'date-fns';
+import { addDays, format, isToday, parse } from 'date-fns';
 import 'cross-fetch';
 import style from '../style';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
 const PATH_TEMPLATE = process.env.PATH_TEMPLATE!;
 
-const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
+export const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
+export const STRIPCROSS_LINK_DATE_FORMAT = 'EEEE MMMM d';
 
 function determineRequestPath(originPath: string) {
+  let requestDate;
   let requestDateString;
 
   if (originPath === '/') {
-    requestDateString = format(new Date(), DATE_FORMAT);
+    requestDate = new Date();
+    requestDateString = format(requestDate, DATE_FORMAT);
   } else {
     const originDateString = originPath.substring(1);
     const parsedDate = parse(originDateString, STRIPCROSS_PATH_DATE_FORMAT, new Date());
     requestDateString = format(parsedDate, DATE_FORMAT);
+    requestDate = parsedDate;
   }
 
-  return PATH_TEMPLATE.replace('FORMATTED_DATE', requestDateString);
+  return {
+    path: PATH_TEMPLATE.replace('FORMATTED_DATE', requestDateString),
+    date: requestDate,
+  };
 }
 
 function extractSelector(document: Document, selector: string) {
@@ -34,12 +41,12 @@ function extractSelectors(document: Document, selectors: string[]) {
 
 const register = (router: Router) => {
   router.get('/*', async ctx => {
-    const requestPath = determineRequestPath(ctx.request.path);
+    const { date, path } = determineRequestPath(ctx.request.path);
     ctx.status = 200;
 
     const hidePuzzle = ctx.query['hide-puzzle'] === '';
 
-    const original = await fetch(`${process.env.BASE_HOST}${requestPath}`);
+    const original = await fetch(`${process.env.BASE_HOST}${path}`);
     const html = await original.text();
     const htmlWithoutColons = html.replace(/ : </g, '<');
 
@@ -65,6 +72,20 @@ const register = (router: Router) => {
       links += '<a id="show-puzzle" href="?">Show puzzle</a>';
     } else {
       links += '<a id="hide-puzzle" href="?hide-puzzle">Hide puzzle</a>';
+    }
+
+    const previousDate = addDays(date, -1);
+    links += `<a class="previous" href="${format(previousDate, STRIPCROSS_PATH_DATE_FORMAT)}">« ${format(
+      previousDate,
+      STRIPCROSS_LINK_DATE_FORMAT,
+    )}</a>`;
+
+    if (!isToday(date)) {
+      const nextDate = addDays(date, 1);
+      links += `<a class="next" href="${format(nextDate, STRIPCROSS_PATH_DATE_FORMAT)}">${format(
+        nextDate,
+        STRIPCROSS_LINK_DATE_FORMAT,
+      )} »</a>`;
     }
 
     const newDocumentString = `
