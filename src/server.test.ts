@@ -50,10 +50,14 @@ describe('stripcross', () => {
         </html>
     `);
 
-    const response = await request(server).get('/');
-    const { document } = new JSDOM(response.text).window;
+    let response = await request(server).get('/');
+    let { document } = new JSDOM(response.text).window;
 
     expect(fetchMock.mock.calls[0][0]).toContain(format(new Date(), DATE_FORMAT));
+
+    expect(document.querySelector('body.hide-puzzle')).toBeNull();
+    expect(document.querySelector('#hide-puzzle')).not.toBeNull();
+    expect(document.querySelector('#show-puzzle')).toBeNull();
 
     expect(document.querySelector('#Title')).not.toBeNull();
     expect(document.querySelector('#Subtitle')).not.toBeNull();
@@ -79,7 +83,13 @@ describe('stripcross', () => {
     expect(document.querySelector('#OtherPassthrough')).not.toBeNull();
     expect(document.querySelector('#FakePassthrough')).toBeNull();
 
-    await request(server).get('/2019-01-01');
+    response = await request(server).get('/2019-01-01?hide-puzzle');
+    document = new JSDOM(response.text).window.document;
+
     expect(fetchMock.mock.calls[1][0]).toEqual('/20190101.html');
+
+    expect(document.querySelector('body.hide-puzzle')).not.toBeNull();
+    expect(document.querySelector('#hide-puzzle')).toBeNull();
+    expect(document.querySelector('#show-puzzle')).not.toBeNull();
   });
 });

@@ -37,6 +37,8 @@ const register = (router: Router) => {
     const requestPath = determineRequestPath(ctx.request.path);
     ctx.status = 200;
 
+    const hidePuzzle = ctx.query['hide-puzzle'] === '';
+
     const original = await fetch(`${process.env.BASE_HOST}${requestPath}`);
     const html = await original.text();
     const htmlWithoutColons = html.replace(/ : </g, '<');
@@ -57,15 +59,24 @@ const register = (router: Router) => {
 
     document.querySelectorAll(`${process.env.CLUES_SELECTOR} a`).forEach(element => element.remove());
 
+    let links = '';
+
+    if (hidePuzzle) {
+      links += '<a id="show-puzzle" href="?">Show puzzle</a>';
+    } else {
+      links += '<a id="hide-puzzle" href="?hide-puzzle">Hide puzzle</a>';
+    }
+
     const newDocumentString = `
         <html>
             <head>
               <style>${style()}</style>
             </head>
-            <body>
+            <body class="${hidePuzzle ? 'hide-puzzle' : ''}">
                 ${extractSelectors(document, process.env.PASSTHROUGH_SELECTORS!.split(' '))}
                 ${extractSelector(document, 'h1:first-of-type')}
                 ${extractSelector(document, 'h1 + h2:first-of-type')}
+                ${links}
                 ${extractSelector(document, process.env.PUZZLE_SELECTOR!)}
                 ${extractSelector(document, process.env.CLUES_SELECTOR!)}
             </body>

@@ -18,11 +18,15 @@ html {
   }
   
   @media print {
-    a.previous, a.next {
+    a.puzzle-toggle, a.previous, a.next {
       display: none;
     }
   }
   
+  a.puzzle-toggle {
+    margin-right: 1rem;
+  }
+
   a.previous + a.next {
     margin-left: 1rem;
   }
@@ -99,6 +103,14 @@ html {
   CLUES_SELECTOR div div div:nth-child(even)::after {
     content: '';
     display: block;
+  }
+
+  body.hide-puzzle table {
+    display: none;
+  }
+
+  body.hide-puzzle CLUES_SELECTOR {
+    column-count: 2;
   }
 `;
 
