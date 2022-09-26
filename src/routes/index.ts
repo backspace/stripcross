@@ -28,6 +28,10 @@ function extractSelector(document: Document, selector: string) {
   return element?.outerHTML || '';
 }
 
+function extractSelectors(document: Document, selectors: string[]) {
+  return selectors.map(selector => extractSelector(document, selector)).join('\n');
+}
+
 const register = (router: Router) => {
   router.get('/*', async ctx => {
     const requestPath = determineRequestPath(ctx.request.path);
@@ -59,6 +63,7 @@ const register = (router: Router) => {
               <style>${style()}</style>
             </head>
             <body>
+                ${extractSelectors(document, process.env.PASSTHROUGH_SELECTORS!.split(' '))}
                 ${extractSelector(document, 'h1:first-of-type')}
                 ${extractSelector(document, 'h1 + h2:first-of-type')}
                 ${extractSelector(document, process.env.PUZZLE_SELECTOR!)}

@@ -75,6 +75,10 @@ describe('stripcross', () => {
     expect(response.text).not.toContain('A clue :');
     expect(response.text).not.toContain('A clue:');
 
+    expect(document.querySelector('#Passthrough')).not.toBeNull();
+    expect(document.querySelector('#OtherPassthrough')).not.toBeNull();
+    expect(document.querySelector('#FakePassthrough')).toBeNull();
+
     await request(server).get('/2019-01-01');
     expect(fetchMock.mock.calls[1][0]).toEqual('/20190101.html');
   });
