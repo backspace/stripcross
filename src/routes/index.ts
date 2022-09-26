@@ -69,9 +69,9 @@ const register = (router: Router) => {
     let links = '';
 
     if (hidePuzzle) {
-      links += '<a id="show-puzzle" href="?">Show puzzle</a>';
+      links += '<a class="puzzle-toggle" id="show-puzzle" href="?">Show puzzle</a>';
     } else {
-      links += '<a id="hide-puzzle" href="?hide-puzzle">Hide puzzle</a>';
+      links += '<a class="puzzle-toggle" id="hide-puzzle" href="?hide-puzzle">Hide puzzle</a>';
     }
 
     const previousDate = addDays(date, -1);
