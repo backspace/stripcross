@@ -51,6 +51,10 @@ function extractSelectors(document: Document, selectors: string[]) {
 }
 
 const register = (router: Router) => {
+  router.get('/favicon.ico', async ctx => {
+    ctx.status = 404;
+  });
+
   router.get('/*', async ctx => {
     const { date, path } = determineRequestPath(ctx.request.path);
     ctx.status = 200;
