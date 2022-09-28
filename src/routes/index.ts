@@ -28,7 +28,7 @@ let redis: any;
       console.log('Redis connected', new Date().toISOString());
     });
 
-    redis.on('error', e => {
+    redis.on('error', (e: any) => {
       // eslint-disable-next-line no-console
       console.error('Redis error', e);
     });
