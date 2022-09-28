@@ -1,5 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 import request from 'supertest';
+import { createClient, RedisClientType } from 'redis';
 import { Server } from 'http';
 import { JSDOM } from 'jsdom';
 import { addDays, format } from 'date-fns';
@@ -15,14 +16,23 @@ fetchMock.enableMocks();
 
 describe('stripcross', () => {
   let server: Server;
+  let redis: RedisClientType;
 
-  beforeEach(done => {
+  beforeEach(async () => {
     const app = createServer();
-    server = app.listen(() => done());
+
+    await new Promise(resolve => {
+      server = app.listen(() => resolve);
+    });
+
     fetchMock.resetMocks();
   });
 
   test('/', async () => {
+    redis = createClient();
+    await redis.connect();
+    await redis.flushAll();
+
     fetchMock.mockResponse(`
         <html>
             <head>
@@ -114,5 +124,56 @@ describe('stripcross', () => {
 
     expect(nextLink?.innerHTML).toContain(format(nextDate, STRIPCROSS_LINK_DATE_FORMAT));
     expect(nextLink?.attributes.getNamedItem('href')!.value).toBe(format(nextDate, STRIPCROSS_PATH_DATE_FORMAT));
+  });
+
+  test('caching', async () => {
+    redis = createClient();
+    await redis.connect();
+    await redis.flushAll();
+
+    await redis.set(
+      '2006-06-25',
+      `
+        <html>
+            <head>
+            <title>Hello</title>
+            </head>
+            <body>
+            <div id=ignored>this is ignored</div>
+            <h1 id=Title>Cached</h1>
+            <h2 id=Subtitle></h2>
+            <div id=Passthrough>something</div>
+            <table id=Puzzle>
+            </table>
+            <div id=Clues>
+            </div>
+            </body>
+        </html>
+    `,
+    );
+
+    fetchMock.mockResponse(`
+        <html>
+            <head>
+            <title>Hello</title>
+            </head>
+            <body>
+            <div id=ignored>this is ignored</div>
+            <h1 id=Title>Not cached</h1>
+            <h2 id=Subtitle></h2>
+            <div id=Passthrough>something</div>
+            <table id=Puzzle>
+            </table>
+            <div id=Clues>
+            </div>
+            </body>
+        </html>
+    `);
+
+    const response = await request(server).get('/2006-05-26');
+    const { document } = new JSDOM(response.text).window;
+
+    expect(fetchMock.mock.calls.length).toEqual(0);
+    expect(document.querySelector('#Title')?.innerHTML).toEqual('Cached');
   });
 });

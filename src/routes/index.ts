@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
 import { addDays, format, isToday, parse } from 'date-fns';
 import 'cross-fetch/polyfill';
+import { createClient, RedisClientOptions } from 'redis';
 import style from '../style';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
@@ -9,6 +10,15 @@ const PATH_TEMPLATE = process.env.PATH_TEMPLATE!;
 
 export const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
 export const STRIPCROSS_LINK_DATE_FORMAT = 'EEEE MMMM d';
+
+const redisConfig: RedisClientOptions = {};
+
+if (process.env.REDIS_URL) {
+  redisConfig.url = process.env.REDIS_URL;
+}
+
+const redis = createClient(redisConfig);
+redis.connect();
 
 function determineRequestPath(originPath: string) {
   let requestDate;
@@ -27,6 +37,7 @@ function determineRequestPath(originPath: string) {
   return {
     path: PATH_TEMPLATE.replace('FORMATTED_DATE', requestDateString),
     date: requestDate,
+    requestDateString,
   };
 }
 
@@ -46,13 +57,32 @@ const register = (router: Router) => {
 
     const hidePuzzle = ctx.query['hide-puzzle'] === '';
 
-    const original = await fetch(`${process.env.BASE_HOST}${path}`, {
-      headers: {
-        'User-Agent': ctx.request.headers['user-agent'],
-      },
-    });
+    const cachePath = format(date, STRIPCROSS_PATH_DATE_FORMAT);
 
-    const html = await original.text();
+    let cached;
+
+    try {
+      cached = await redis.get(cachePath);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Error checking cache', e);
+    }
+
+    let html;
+
+    if (cached) {
+      html = cached;
+    } else {
+      const original = await fetch(`${process.env.BASE_HOST}${path}`, {
+        headers: {
+          'User-Agent': ctx.request.headers['user-agent'],
+        },
+      });
+
+      html = await original.text();
+      await redis.set(cachePath, html);
+    }
+
     const htmlWithoutColons = html.replace(/ : </g, '<');
 
     const { document } = new JSDOM(htmlWithoutColons).window;
