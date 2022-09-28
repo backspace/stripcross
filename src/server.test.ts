@@ -1,6 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 import request from 'supertest';
-import type { Server } from 'http';
+import { Server } from 'http';
 import { JSDOM } from 'jsdom';
 import { addDays, format } from 'date-fns';
 import { createServer } from './server';
@@ -16,7 +16,7 @@ fetchMock.enableMocks();
 describe('stripcross', () => {
   let server: Server;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     const app = createServer();
     server = app.listen(() => done());
     fetchMock.resetMocks();
@@ -67,7 +67,9 @@ describe('stripcross', () => {
     const previousDate = addDays(new Date(), -1);
 
     expect(previousLink?.innerHTML).toContain(format(previousDate, STRIPCROSS_LINK_DATE_FORMAT));
-    expect(previousLink?.attributes.getNamedItem('href')!.value).toBe(format(previousDate, STRIPCROSS_PATH_DATE_FORMAT));
+    expect(previousLink?.attributes.getNamedItem('href')!.value).toBe(
+      format(previousDate, STRIPCROSS_PATH_DATE_FORMAT),
+    );
 
     expect(document.querySelector('a.next')).toBeNull();
 
