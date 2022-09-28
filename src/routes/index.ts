@@ -1,7 +1,7 @@
 import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
 import { addDays, format, isToday, parse } from 'date-fns';
-import 'cross-fetch';
+import 'cross-fetch/polyfill';
 import style from '../style';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
