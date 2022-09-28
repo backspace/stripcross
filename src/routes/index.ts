@@ -17,8 +17,15 @@ if (process.env.REDIS_URL) {
   redisConfig.url = process.env.REDIS_URL;
 }
 
-const redis = createClient(redisConfig);
-redis.connect();
+let redis: any;
+
+try {
+  redis = createClient(redisConfig);
+  redis.connect();
+} catch (e) {
+  // eslint-disable-next-line no-console
+  console.log('Error connecting cache', e);
+}
 
 function determineRequestPath(originPath: string) {
   let requestDate;
@@ -84,7 +91,13 @@ const register = (router: Router) => {
       });
 
       html = await original.text();
-      await redis.set(cachePath, html);
+
+      try {
+        await redis.set(cachePath, html);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log('Error writing to cache', e);
+      }
     }
 
     const htmlWithoutColons = html.replace(/ : </g, '<');
