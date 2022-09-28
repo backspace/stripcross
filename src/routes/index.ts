@@ -19,24 +19,26 @@ if (process.env.REDIS_URL) {
 
 let redis: any;
 
-try {
-  redis = createClient(redisConfig);
+(async () => {
+  try {
+    redis = createClient(redisConfig);
 
-  redis.on('connect', () => {
+    redis.on('connect', () => {
+      // eslint-disable-next-line no-console
+      console.log('Redis connected', new Date().toISOString());
+    });
+
+    redis.on('error', e => {
+      // eslint-disable-next-line no-console
+      console.error('Redis error', e);
+    });
+
+    await redis.connect();
+  } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Redis connected', new Date().toISOString());
-  });
-
-  redis.on('error', e => {
-    // eslint-disable-next-line no-console
-    console.error('Redis error', e);
-  });
-
-  redis.connect();
-} catch (e) {
-  // eslint-disable-next-line no-console
-  console.log('Error connecting cache', e);
-}
+    console.log('Error connecting cache', e);
+  }
+})();
 
 function determineRequestPath(originPath: string) {
   let requestDate;
