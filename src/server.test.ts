@@ -54,10 +54,13 @@ describe('stripcross', () => {
         </html>
     `);
 
-    let response = await request(server).get('/');
+    let response = await request(server)
+      .get('/')
+      .set('User-Agent', 'ACAB');
     let { document } = new JSDOM(response.text).window;
 
     expect(fetchMock.mock.calls[0][0]).toContain(format(new Date(), DATE_FORMAT));
+    expect(fetchMock.mock.calls[0][1]).toEqual({ headers: { 'User-Agent': 'ACAB' } });
 
     expect(document.querySelector('body.hide-puzzle')).toBeNull();
     expect(document.querySelector('#hide-puzzle')).not.toBeNull();

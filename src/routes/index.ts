@@ -46,7 +46,12 @@ const register = (router: Router) => {
 
     const hidePuzzle = ctx.query['hide-puzzle'] === '';
 
-    const original = await fetch(`${process.env.BASE_HOST}${path}`);
+    const original = await fetch(`${process.env.BASE_HOST}${path}`, {
+      headers: {
+        'User-Agent': ctx.request.headers['user-agent'],
+      },
+    });
+
     const html = await original.text();
     const htmlWithoutColons = html.replace(/ : </g, '<');
 
