@@ -80,6 +80,7 @@ const register = (router: Router) => {
     ctx.status = 200;
 
     const hidePuzzle = ctx.query['hide-puzzle'] === '';
+    const hideClues = ctx.query['hide-clues'] === '';
 
     const cachePath = format(date, STRIPCROSS_PATH_DATE_FORMAT);
 
@@ -139,6 +140,12 @@ const register = (router: Router) => {
       links += '<a class="puzzle-toggle" id="hide-puzzle" href="?hide-puzzle">Hide puzzle</a>';
     }
 
+    if (hideClues) {
+      links += '<a class="clues-toggle" id="show-clues" href="?">Show clues</a>';
+    } else {
+      links += '<a class="clues-toggle" id="hide-clues" href="?hide-clues">Hide clues</a>';
+    }
+
     const previousDate = addDays(date, -1);
     links += `<a class="previous" href="${format(previousDate, STRIPCROSS_PATH_DATE_FORMAT)}">« ${format(
       previousDate,
@@ -158,7 +165,7 @@ const register = (router: Router) => {
             <head>
               <style>${style()}</style>
             </head>
-            <body class="${hidePuzzle ? 'hide-puzzle' : ''}">
+            <body class="${hidePuzzle ? 'hide-puzzle' : ''} ${hideClues ? 'hide-clues' : ''}">
                 ${extractSelectors(document, process.env.PASSTHROUGH_SELECTORS!.split(' '))}
                 ${extractSelector(document, 'h1:first-of-type')}
                 ${extractSelector(document, 'h1 + h2:first-of-type')}

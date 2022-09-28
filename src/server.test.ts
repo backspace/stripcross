@@ -73,8 +73,11 @@ describe('stripcross', () => {
     expect(fetchMock.mock.calls[0][1]).toEqual({ headers: { 'User-Agent': 'ACAB' } });
 
     expect(document.querySelector('body.hide-puzzle')).toBeNull();
+    expect(document.querySelector('body.hide-clues')).toBeNull();
     expect(document.querySelector('#hide-puzzle')).not.toBeNull();
     expect(document.querySelector('#show-puzzle')).toBeNull();
+    expect(document.querySelector('#hide-clues')).not.toBeNull();
+    expect(document.querySelector('#show-clues')).toBeNull();
 
     const previousLink = document.querySelector('a.previous');
     const previousDate = addDays(new Date(), -1);
@@ -124,6 +127,13 @@ describe('stripcross', () => {
 
     expect(nextLink?.innerHTML).toContain(format(nextDate, STRIPCROSS_LINK_DATE_FORMAT));
     expect(nextLink?.attributes.getNamedItem('href')!.value).toBe(format(nextDate, STRIPCROSS_PATH_DATE_FORMAT));
+
+    response = await request(server).get('/2019-01-01?hide-clues');
+    document = new JSDOM(response.text).window.document;
+
+    expect(document.querySelector('body.hide-clues')).not.toBeNull();
+    expect(document.querySelector('#hide-clues')).toBeNull();
+    expect(document.querySelector('#show-clues')).not.toBeNull();
   });
 
   test('caching', async () => {

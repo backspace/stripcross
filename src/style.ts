@@ -18,12 +18,12 @@ html {
   }
   
   @media print {
-    a.puzzle-toggle, a.previous, a.next {
+    a.puzzle-toggle, a.clues-toggle, a.previous, a.next {
       display: none;
     }
   }
   
-  a.puzzle-toggle {
+  a.puzzle-toggle, a.clues-toggle {
     margin-right: 1rem;
   }
 
@@ -111,6 +111,14 @@ html {
 
   body.hide-puzzle CLUES_SELECTOR {
     column-count: 2;
+  }
+
+  body.hide-clues CLUES_SELECTOR {
+    display: none;
+  }
+
+  body.hide-clues table {
+    float: none;
   }
 `;
 
