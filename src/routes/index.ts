@@ -21,6 +21,17 @@ let redis: any;
 
 try {
   redis = createClient(redisConfig);
+
+  redis.on('connect', () => {
+    // eslint-disable-next-line no-console
+    console.log('Redis connected', new Date().toISOString());
+  });
+
+  redis.on('error', e => {
+    // eslint-disable-next-line no-console
+    console.error('Redis error', e);
+  });
+
   redis.connect();
 } catch (e) {
   // eslint-disable-next-line no-console
