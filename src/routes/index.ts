@@ -2,43 +2,14 @@ import Router from 'koa-router';
 import { JSDOM } from 'jsdom';
 import { addDays, format, isToday, parse } from 'date-fns';
 import 'cross-fetch/polyfill';
-import { createClient, RedisClientOptions } from 'redis';
 import style from '../style';
+import { getClient } from '../redis';
 
 const DATE_FORMAT = process.env.DATE_FORMAT!;
 const PATH_TEMPLATE = process.env.PATH_TEMPLATE!;
 
 export const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
 export const STRIPCROSS_LINK_DATE_FORMAT = 'EEEE MMMM d';
-
-const redisConfig: RedisClientOptions = {};
-
-if (process.env.REDIS_URL) {
-  redisConfig.url = process.env.REDIS_URL;
-}
-
-let redis: any;
-
-(async () => {
-  try {
-    redis = createClient(redisConfig);
-
-    redis.on('connect', () => {
-      // eslint-disable-next-line no-console
-      console.log('Redis connected', new Date().toISOString());
-    });
-
-    redis.on('error', (e: any) => {
-      // eslint-disable-next-line no-console
-      console.error('Redis error', e);
-    });
-
-    await redis.connect();
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Error connecting cache', e);
-  }
-})();
 
 function determineRequestPath(originPath: string) {
   let requestDate;
@@ -76,6 +47,8 @@ const register = (router: Router) => {
   });
 
   router.get('/*', async ctx => {
+    const redis = getClient();
+
     const { date, path } = determineRequestPath(ctx.request.path);
     ctx.status = 200;
 

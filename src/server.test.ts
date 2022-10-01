@@ -1,10 +1,11 @@
 import fetchMock from 'jest-fetch-mock';
 import request from 'supertest';
-import { createClient, RedisClientType } from 'redis';
+import { createClient } from 'redis';
 import { Server } from 'http';
 import { JSDOM } from 'jsdom';
 import { addDays, format } from 'date-fns';
 import { createServer } from './server';
+import { connect, getClient, disconnect } from './redis';
 
 // FIXME what doesn’t importing these work
 const STRIPCROSS_PATH_DATE_FORMAT = 'y-MM-dd';
@@ -16,23 +17,29 @@ fetchMock.enableMocks();
 
 describe('stripcross', () => {
   let server: Server;
-  let redis: RedisClientType;
+  let redis: ReturnType<typeof createClient>;
 
   beforeEach(async () => {
     const app = createServer();
 
     await new Promise(resolve => {
-      server = app.listen(() => resolve);
+      server = app.listen(() => {
+        resolve(true);
+      });
     });
 
     fetchMock.resetMocks();
+
+    await connect();
+    redis = getClient();
+  });
+
+  afterEach(async () => {
+    await redis.flushAll();
+    await disconnect();
   });
 
   test('/', async () => {
-    redis = createClient();
-    await redis.connect();
-    await redis.flushAll();
-
     fetchMock.mockResponse(`
         <html>
             <head>
@@ -137,12 +144,8 @@ describe('stripcross', () => {
   });
 
   test('caching', async () => {
-    redis = createClient();
-    await redis.connect();
-    await redis.flushAll();
-
     await redis.set(
-      '2006-06-25',
+      '2006-05-26',
       `
         <html>
             <head>
