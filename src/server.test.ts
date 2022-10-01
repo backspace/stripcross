@@ -143,6 +143,44 @@ describe('stripcross', () => {
     expect(document.querySelector('#show-clues')).not.toBeNull();
   });
 
+  test('warns on unknown classes', async () => {
+    fetchMock.mockResponse(`
+        <html>
+            <head>
+            <title>Hello</title>
+            </head>
+            <body>
+            <div id=ignored>this is ignored</div>
+            <h1 id=Title></h1>
+            <h2 id=Subtitle></h2>
+            <div id=Passthrough>something</div>
+            <table id=Puzzle>
+                <tr><td id=preserved>this is preserved</td></tr>
+                <tr>
+                <td class=unknown></td>
+                <td class="something"></td>
+                <td class="something-else"></td>
+                </tr>
+            </table>
+            <div id=Clues>
+                <div>1</div>
+                <div id=preservedclue>A clue : <a>AN ANSWER</a></div>
+            </div>
+            <div id=OtherPassthrough></div>
+            <div>
+                <h1 id=IgnoredTitle></h1>
+                <h2 id=IgnoredSubtitle></h2>
+            </div>
+            </body>
+        </html>
+    `);
+
+    const response = await request(server).get('/');
+    const { document } = new JSDOM(response.text).window;
+
+    expect(document.querySelector('.warning')?.innerHTML).toEqual('Puzzle contains unknown class(es): unknown');
+  });
+
   test('caching', async () => {
     await redis.set(
       '2006-05-26',

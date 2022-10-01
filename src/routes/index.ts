@@ -91,6 +91,24 @@ const register = (router: Router) => {
 
     const { document } = new JSDOM(htmlWithoutColons).window;
 
+    let warning = '';
+    const cellClasses = new Set();
+
+    document.querySelectorAll(`${process.env.PUZZLE_SELECTOR} td`).forEach(cell => {
+      cell.classList.forEach(className => cellClasses.add(className));
+    });
+
+    process.env.PUZZLE_CLASS_MAPPINGS?.split(' ').forEach(selector => {
+      const [oldClass] = selector.split(':');
+      cellClasses.delete(oldClass);
+    });
+
+    if (cellClasses.size > 0) {
+      warning = `<div class='warning'>Puzzle contains unknown class(es): ${Array.from(cellClasses.values()).join(
+        ', ',
+      )}</div>`;
+    }
+
     process.env.REMOVE_SELECTORS?.split(' ').forEach(selector => {
       document.querySelectorAll(selector).forEach(element => element.remove());
     });
@@ -142,6 +160,7 @@ const register = (router: Router) => {
                 ${extractSelectors(document, process.env.PASSTHROUGH_SELECTORS!.split(' '))}
                 ${extractSelector(document, 'h1:first-of-type')}
                 ${extractSelector(document, 'h1 + h2:first-of-type')}
+                ${warning}
                 ${links}
                 ${extractSelector(document, process.env.PUZZLE_SELECTOR!)}
                 ${extractSelector(document, process.env.CLUES_SELECTOR!)}
