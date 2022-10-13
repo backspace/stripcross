@@ -18,12 +18,12 @@ html {
   }
   
   @media print {
-    a.puzzle-toggle, a.clues-toggle, a.previous, a.next {
+    a.break-cache, a.puzzle-toggle, a.clues-toggle, a.previous, a.next {
       display: none;
     }
   }
   
-  a.puzzle-toggle, a.clues-toggle {
+  a.break-cache, a.puzzle-toggle, a.clues-toggle {
     margin-right: 1rem;
   }
 

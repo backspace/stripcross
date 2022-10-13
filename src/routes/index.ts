@@ -55,15 +55,19 @@ const register = (router: Router) => {
     const hidePuzzle = ctx.query['hide-puzzle'] === '';
     const hideClues = ctx.query['hide-clues'] === '';
 
+    const breakCache = ctx.query['break-cache'] === '';
+
     const cachePath = format(date, STRIPCROSS_PATH_DATE_FORMAT);
 
     let cached;
 
-    try {
-      cached = await redis.get(cachePath);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('Error checking cache', e);
+    if (!breakCache) {
+      try {
+        cached = await redis.get(cachePath);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log('Error checking cache', e);
+      }
     }
 
     let html;
@@ -135,7 +139,7 @@ const register = (router: Router) => {
 
     document.querySelectorAll(`${process.env.CLUES_SELECTOR} a`).forEach(element => element.remove());
 
-    let links = '';
+    let links = '<a class="break-cache" id="break-cache" href="?break-cache">Break cache</a>';
 
     if (hidePuzzle) {
       links += '<a class="puzzle-toggle" id="show-puzzle" href="?">Show puzzle</a>';

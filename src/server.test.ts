@@ -181,7 +181,7 @@ describe('stripcross', () => {
     expect(document.querySelector('.warning')?.innerHTML).toEqual('Puzzle contains unknown class(es): unknown');
   });
 
-  test('caching', async () => {
+  test('cache can be refreshed', async () => {
     await redis.set(
       '2006-05-26',
       `
@@ -221,10 +221,10 @@ describe('stripcross', () => {
         </html>
     `);
 
-    const response = await request(server).get('/2006-05-26');
+    const response = await request(server).get('/2006-05-26?break-cache');
     const { document } = new JSDOM(response.text).window;
 
-    expect(fetchMock.mock.calls.length).toEqual(0);
-    expect(document.querySelector('#Title')?.innerHTML).toEqual('Cached');
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(document.querySelector('#Title')?.innerHTML).toEqual('Not cached');
   });
 });
