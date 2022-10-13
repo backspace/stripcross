@@ -71,11 +71,23 @@ const register = (router: Router) => {
     if (cached) {
       html = cached;
     } else {
-      const original = await fetch(`${process.env.BASE_HOST}${path}`, {
-        headers: {
-          'User-Agent': ctx.request.headers['user-agent'],
-        },
-      });
+      const url = `${process.env.BASE_HOST}${path}`;
+      let original;
+
+      try {
+        original = await fetch(url, {
+          headers: {
+            'User-Agent': ctx.request.headers['user-agent'],
+          },
+        });
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log(`Error fetching ${url}`, e);
+
+        ctx.status = 400;
+        ctx.body = 'Unknown error';
+        return;
+      }
 
       html = await original.text();
 
