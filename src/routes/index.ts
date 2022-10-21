@@ -139,7 +139,7 @@ const register = (router: Router) => {
 
     document.querySelectorAll(`${process.env.CLUES_SELECTOR} a`).forEach(element => element.remove());
 
-    let links = '<a class="break-cache" id="break-cache" href="?break-cache">Break cache</a>';
+    let links = '<a class="break-cache" id="break-cache" href="?break-cache">Refetch from source</a>';
 
     if (hidePuzzle) {
       links += '<a class="puzzle-toggle" id="show-puzzle" href="?">Show puzzle</a>';
