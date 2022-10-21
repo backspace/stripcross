@@ -227,4 +227,30 @@ describe('stripcross', () => {
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(document.querySelector('#Title')?.innerHTML).toEqual('Not cached');
   });
+
+  test('missing puzzle is detected and not cached', async () => {
+    fetchMock.mockResponse(`
+        <html>
+            <head>
+            <title>Hello</title>
+            </head>
+            <body>
+            <div id=ignored>this is ignored</div>
+            <h1 id=Title>Not cached</h1>
+            <h2 id=Subtitle></h2>
+            <div id=Passthrough>something</div>
+            <div id=Clues>
+            </div>
+            </body>
+        </html>
+    `);
+
+    const response = await request(server).get('/2006-05-26');
+    const { document } = new JSDOM(response.text).window;
+
+    expect(fetchMock.mock.calls.length).toEqual(1);
+    expect(document.querySelector('title')?.innerHTML).toContain('not found');
+
+    expect(await redis.dbSize()).toEqual(0);
+  });
 });

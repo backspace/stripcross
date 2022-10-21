@@ -94,18 +94,18 @@ const register = (router: Router) => {
       }
 
       html = await original.text();
-
-      try {
-        await redis.set(cachePath, html);
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log('Error writing to cache', e);
-      }
     }
 
     const htmlWithoutColons = html.replace(/ : </g, '<');
 
     const { document } = new JSDOM(htmlWithoutColons).window;
+
+    if (!document.querySelector(process.env.PUZZLE_SELECTOR!)) {
+      ctx.body =
+        '<html><head><title>Puzzle not found</title><body>No puzzle was found. Is the date correct?</body></html>';
+      ctx.status = 404;
+      return;
+    }
 
     let warning = '';
     const cellClasses = new Set();
@@ -185,6 +185,13 @@ const register = (router: Router) => {
     `;
 
     ctx.body = newDocumentString;
+
+    try {
+      await redis.set(cachePath, html);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Error writing to cache', e);
+    }
   });
 };
 
