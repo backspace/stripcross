@@ -153,15 +153,17 @@ const register = (router: Router) => {
       links += '<a class="clues-toggle" id="hide-clues" href="?hide-clues">Hide clues</a>';
     }
 
+    const queryStringToAppend = ctx.querystring.length > 0 ? `?${ctx.querystring.replace('break-cache', '')}` : '';
+
     const previousDate = addDays(date, -1);
-    links += `<a class="previous" href="${format(previousDate, STRIPCROSS_PATH_DATE_FORMAT)}">« ${format(
+    links += `<a class="previous" href="${format(
       previousDate,
-      STRIPCROSS_LINK_DATE_FORMAT,
-    )}</a>`;
+      STRIPCROSS_PATH_DATE_FORMAT,
+    )}${queryStringToAppend}">« ${format(previousDate, STRIPCROSS_LINK_DATE_FORMAT)}</a>`;
 
     if (!isToday(date)) {
       const nextDate = addDays(date, 1);
-      links += `<a class="next" href="${format(nextDate, STRIPCROSS_PATH_DATE_FORMAT)}">${format(
+      links += `<a class="next" href="${format(nextDate, STRIPCROSS_PATH_DATE_FORMAT)}${queryStringToAppend}">${format(
         nextDate,
         STRIPCROSS_LINK_DATE_FORMAT,
       )} »</a>`;

@@ -133,7 +133,9 @@ describe('stripcross', () => {
     const nextDate = addDays(new Date(2019, 0, 1), 1);
 
     expect(nextLink?.innerHTML).toContain(format(nextDate, STRIPCROSS_LINK_DATE_FORMAT));
-    expect(nextLink?.attributes.getNamedItem('href')!.value).toBe(format(nextDate, STRIPCROSS_PATH_DATE_FORMAT));
+    expect(nextLink?.attributes.getNamedItem('href')!.value).toBe(
+      `${format(nextDate, STRIPCROSS_PATH_DATE_FORMAT)}?hide-puzzle`,
+    );
 
     response = await request(server).get('/2019-01-01?hide-clues');
     document = new JSDOM(response.text).window.document;
@@ -226,6 +228,9 @@ describe('stripcross', () => {
 
     expect(fetchMock.mock.calls.length).toEqual(1);
     expect(document.querySelector('#Title')?.innerHTML).toEqual('Not cached');
+
+    const nextLink = document.querySelector('a.next');
+    expect(nextLink?.attributes.getNamedItem('href')!.value).not.toContain('break-cache');
   });
 
   test('missing puzzle is detected and not cached', async () => {
